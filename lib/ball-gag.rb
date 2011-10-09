@@ -1,0 +1,2 @@
+require 'ball-gag/version'
+
