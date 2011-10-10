@@ -33,6 +33,9 @@ GEM
       method_source (~> 0.6.5)
       ruby_parser (~> 2.0.5)
       slop (~> 2.1.0)
+    pry-remote (0.1.0)
+      pry (~> 0.9.6)
+      slop (~> 2.1)
     rb-appscript (0.6.1)
     rb-fsevent (0.4.3.1)
     rspec (2.6.0)
@@ -61,6 +64,7 @@ DEPENDENCIES
   guard-rspec
   guard-spork
   pry
+  pry-remote
   rb-fsevent
   rspec (>= 2.6.0)
   spork (~> 0.9.0.rc9)

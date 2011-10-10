@@ -3,6 +3,7 @@ require 'spork'
 Spork.prefork do
   require 'rspec'
   require 'active_model'
+  require 'pry-remote'
 end
 
 Spork.each_run do

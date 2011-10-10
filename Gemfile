@@ -11,6 +11,7 @@ group :development do
   gem 'guard-rspec'
   gem 'guard-spork'
   gem 'pry'
+  gem 'pry-remote'
   gem 'activemodel'
 end
 
