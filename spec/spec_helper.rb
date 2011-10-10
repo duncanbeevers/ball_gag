@@ -7,6 +7,6 @@ end
 
 Spork.each_run do
   require 'ball-gag'
-  require './spec/models'
+  require File.join(File.dirname(__FILE__), 'support/models')
 end
 
