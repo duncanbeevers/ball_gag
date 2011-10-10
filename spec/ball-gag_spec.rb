@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe 'Plain Old Ruby Object' do
+  before { ExampleModel.clear_gagged_attributes }
+
   it 'should have no gagged attributes' do
     ExampleModel.gagged_attributes.should be_empty
   end
@@ -33,10 +35,12 @@ describe 'Plain Old Ruby Object' do
   end
 
   it 'should add new attribute_gagged? method' do
+    ExampleModel.gag :words
     ExampleModel.new.should respond_to :words_gagged?
   end
 
   it 'should add new attribute_not_gagged? method' do
+    ExampleModel.gag :words
     ExampleModel.new.should respond_to :words_not_gagged?
   end
   end
