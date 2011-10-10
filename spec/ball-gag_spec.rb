@@ -43,6 +43,32 @@ describe 'Plain Old Ruby Object' do
     ExampleModel.gag :words
     ExampleModel.new.should respond_to :words_not_gagged?
   end
+
+  context 'when gagged with a callable' do
+    it 'should call callable when checking whether attribute is gagged' do
+      callable = {}
+      ExampleModel.gag :words, callable
+      instance = ExampleModel.new
+      attribute_value = instance.words
+
+      callable.should_receive(:call).with({ :words => attribute_value }, instance)
+      instance.words_gagged?
+    end
+
+    it 'should call block when checking whether attribute is gagged' do
+      a = nil
+      b = nil
+      ExampleModel.gag :words do |unsanitized_values, instance|
+        a = unsanitized_values
+        b = instance
+      end
+      instance = ExampleModel.new
+      attribute_value = instance.words
+
+      instance.words_gagged?
+      a.should == { :words => attribute_value }
+      b.should == instance
+    end
   end
 end
 

@@ -15,9 +15,9 @@ module BallGag
       @gagged_attributes.keys
     end
 
-    def gag attribute, &block
+    def gag attribute, callable = nil, &block
       define_and_mixin_gagged_attributes_methods
-      @gagged_attributes[attribute] = block || lambda { }
+      @gagged_attributes[attribute] = callable || block || lambda { |*| }
 
       define_gagged_interpellation attribute, @gagged_attributes[attribute]
       define_not_gagged_interpellation attribute
@@ -37,8 +37,9 @@ module BallGag
     end
 
     def define_gagged_interpellation attribute, block
+      callable = @gagged_attributes[attribute]
       @gagged_attributes_methods.send(:define_method, gagged_attribute_interpellation_name(attribute)) do
-        @gagged_attributes[attribute].call(self.send(attribute), self)
+        callable.call({ attribute => self.send(attribute) }, self)
       end
     end
 
