@@ -11,7 +11,16 @@ module BallGag
 
   module ClassMethods
     def gagged_attributes
-      []
+      @gagged_attributes || clear_gagged_attributes
+      @gagged_attributes.keys
+    end
+
+    def gag attribute
+      @gagged_attributes[attribute] = true
+    end
+
+    def clear_gagged_attributes
+      @gagged_attributes = {}
     end
   end
 end
