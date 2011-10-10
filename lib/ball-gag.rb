@@ -24,16 +24,14 @@ module BallGag
     end
 
     def clear_gagged_attributes
-      undefine_gagged_attributes_methods if @gagged_attributes
-      @gagged_attributes = {}
+      undefine_gagged_attributes_methods
     end
 
     private
     def define_and_mixin_gagged_attributes_methods
-      return if @gagged_attirbutes_methods
+      return if @gagged_attributes_methods
 
       undefine_gagged_attributes_methods
-      include @gagged_attributes_methods
     end
 
     def define_gagged_interpellation attribute, block
@@ -44,8 +42,9 @@ module BallGag
     end
 
     def define_not_gagged_interpellation attribute
+      gagged_method_name = gagged_attribute_interpellation_name(attribute)
       @gagged_attributes_methods.send(:define_method, gagged_attribute_negative_interpellation_name(attribute)) do
-        !method(gagged_attribute_interpellation_name(attribute)).call
+        !method(gagged_method_name).call
       end
     end
 
@@ -61,8 +60,10 @@ module BallGag
       @gagged_attributes.keys.each do |attribute|
         @gagged_attributes_methods.send(:remove_method, gagged_attribute_interpellation_name(attribute))
         @gagged_attributes_methods.send(:remove_method, gagged_attribute_negative_interpellation_name(attribute))
-      end
+      end if @gagged_attributes
       @gagged_attributes_methods = Module.new
+      include @gagged_attributes_methods
+      @gagged_attributes = {}
     end
   end
 end

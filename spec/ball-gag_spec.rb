@@ -69,6 +69,16 @@ describe 'Plain Old Ruby Object' do
       a.should == { :words => attribute_value }
       b.should == instance
     end
+
+    it 'should return true for attribute_not_gagged? if callable returns true' do
+      ExampleModel.gag :words do |*| false end
+      ExampleModel.new.words_not_gagged?.should be_true
+    end
+
+    it 'should return false for attribute_not_gagged? if callable returns true' do
+      ExampleModel.gag :words do |*| false end
+      ExampleModel.new.words_gagged?.should be_false
+    end
   end
 end
 
