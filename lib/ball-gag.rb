@@ -36,16 +36,18 @@ module BallGag
 
     def define_gagged_interpellation attribute, block
       callable = @gagged_attributes[attribute]
-      @gagged_attributes_methods.send(:define_method, gagged_attribute_interpellation_name(attribute)) do
-        callable.call({ attribute => self.send(attribute) }, self)
-      end
+      @gagged_attributes_methods.send(:define_method,
+        gagged_attribute_interpellation_name(attribute)) do
+          callable.call({ attribute => self.send(attribute) }, self)
+        end
     end
 
     def define_not_gagged_interpellation attribute
       gagged_method_name = gagged_attribute_interpellation_name(attribute)
-      @gagged_attributes_methods.send(:define_method, gagged_attribute_negative_interpellation_name(attribute)) do
-        !method(gagged_method_name).call
-      end
+      @gagged_attributes_methods.send(:define_method,
+        gagged_attribute_negative_interpellation_name(attribute)) do
+          !method(gagged_method_name).call
+        end
     end
 
     def gagged_attribute_interpellation_name attribute
@@ -58,9 +60,15 @@ module BallGag
 
     def undefine_gagged_attributes_methods
       @gagged_attributes.keys.each do |attribute|
-        @gagged_attributes_methods.send(:remove_method, gagged_attribute_interpellation_name(attribute))
-        @gagged_attributes_methods.send(:remove_method, gagged_attribute_negative_interpellation_name(attribute))
+
+        @gagged_attributes_methods.send(:remove_method,
+          gagged_attribute_interpellation_name(attribute))
+
+        @gagged_attributes_methods.send(:remove_method,
+          gagged_attribute_negative_interpellation_name(attribute))
+
       end if @gagged_attributes
+
       @gagged_attributes_methods = Module.new
       include @gagged_attributes_methods
       @gagged_attributes = {}
