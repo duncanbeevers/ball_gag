@@ -22,11 +22,11 @@ module BallGag
       to_call = callable || block || BallGag.engine ||
         lambda { |*| raise NoEngineConfiguredError }
 
-      define_gagged_interpellations(arguments, to_call, options)
+      define_not_gagged_interpellations(arguments, to_call, options)
 
       arguments.each do |attribute|
         @gagged_attributes[attribute] = to_call
-        define_not_gagged_interpellation attribute
+        define_gagged_interpellation attribute
       end
     end
 
@@ -41,29 +41,31 @@ module BallGag
       undefine_gagged_attributes_methods
     end
 
-    def define_gagged_interpellations attributes, callable, options = nil
-      unsanitized_values = lambda { |instance|
+    def define_not_gagged_interpellations attributes, callable, options = nil
+      unsanitized_values = lambda { |it|
         attributes.inject({}) do |a, attribute|
-          a[attribute] = instance.send(attribute)
+          a[attribute] = it.send(attribute)
           a
         end
       }
 
       fn = options ?
-        -> { callable.call(unsanitized_values.call(self), self, options) } :
-        -> { callable.call(unsanitized_values.call(self), self) }
+        lambda { |it| callable.call(unsanitized_values.call(it), it, options) } :
+        lambda { |it| callable.call(unsanitized_values.call(it), it) }
 
-      attributes.each do |attribute|
+      attributes.each do |attr|
         @gagged_attributes_methods.send(:define_method,
-        gagged_attribute_interpellation_name(attribute), &fn)
+          gagged_attribute_negative_interpellation_name(attr)) do
+            fn.call(self)[attr]
+          end
       end
     end
 
-    def define_not_gagged_interpellation attribute
-      gagged_method_name = gagged_attribute_interpellation_name(attribute)
+    def define_gagged_interpellation attribute
+      neg_method = gagged_attribute_negative_interpellation_name(attribute)
       @gagged_attributes_methods.send(:define_method,
-        gagged_attribute_negative_interpellation_name(attribute)) do
-          !method(gagged_method_name).call
+        gagged_attribute_interpellation_name(attribute)) do
+          !method(neg_method).call
         end
     end
 

@@ -76,7 +76,8 @@ describe 'Plain Old Ruby Object' do
       instance.stub!(words: mock_words)
 
       mock_callable.should_receive(:call).
-        with(hash_including(words: mock_words), instance)
+        with(hash_including(words: mock_words), instance).
+        and_return({})
 
       instance.words_gagged?
     end
@@ -87,6 +88,7 @@ describe 'Plain Old Ruby Object' do
       ExampleModel.gag :words do |unsanitized_values, instance|
         a = unsanitized_values
         b = instance
+        {}
       end
       instance = ExampleModel.new
       attribute_value = instance.words
@@ -110,14 +112,16 @@ describe 'Plain Old Ruby Object' do
       passed_options.should eq options
     end
 
-    it 'should return true for attribute_not_gagged? if callable returns true' do
-      ExampleModel.gag :words do |*| false end
-      ExampleModel.new.words_not_gagged?.should be_true
-    end
+    context 'when callable provides true for attribute' do
+      before { ExampleModel.gag :words do |*| { words: true } end }
 
-    it 'should return false for attribute_not_gagged? if callable returns true' do
-      ExampleModel.gag :words do |*| false end
-      ExampleModel.new.words_gagged?.should be_false
+      it 'should return false for attribute_gagged?' do
+        ExampleModel.new.words_gagged?.should be_false
+      end
+
+      it 'should return true for attribute_not_gagged?' do
+        ExampleModel.new.words_not_gagged?.should be_true
+      end
     end
   end
 
@@ -144,7 +148,8 @@ describe 'Plain Old Ruby Object' do
         instance.stub!(words: mock_words)
 
         mock_engine.should_receive(:call).
-          with(hash_including(words: mock_words), instance)
+          with(hash_including(words: mock_words), instance).
+          and_return({})
 
         instance.words_gagged?
       end
