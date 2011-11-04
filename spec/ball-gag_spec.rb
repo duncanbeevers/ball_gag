@@ -16,7 +16,7 @@ describe 'Plain Old Ruby Object' do
     it 'should clear gagged attributes' do
       ExampleModel.gag :words
       ExampleModel.clear_gagged_attributes
-      ExampleModel.gagged_attributes.should == []
+      ExampleModel.gagged_attributes.should be_empty
     end
 
     it 'should remove attribute_not_gagged? method' do
