@@ -56,8 +56,9 @@ module BallGag
       attributes.each do |attr|
         @gagged_attributes_methods.send(:define_method,
           gagged_attribute_negative_interpellation_name(attr)) do
-            @gagged_attribute_results ||= fn.call(self)
-            @gagged_attribute_results[attr]
+            @gagged_attribute_results ||= {}
+            @gagged_attribute_results[attributes] ||= fn.call(self)
+            @gagged_attribute_results[attributes][attr]
           end
       end
     end

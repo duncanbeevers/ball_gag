@@ -57,6 +57,30 @@ describe 'Plain Old Ruby Object' do
     instance.email_gagged?
   end
 
+  it 'should cache separate gaggings' do
+    mock_engine = mock('engine')
+    mock_words = mock('words')
+    mock_email = mock('email')
+    BallGag.engine = mock_engine
+
+    ExampleModel.gag :words
+    ExampleModel.gag :email
+
+    instance = ExampleModel.new
+    instance.stub!(words: mock_words, email: mock_email)
+
+    mock_engine.should_receive(:call).
+      with(hash_including(words: mock_words), instance).
+      once.and_return({})
+
+    mock_engine.should_receive(:call).
+      with(hash_including(email: mock_email), instance).
+      once.and_return({})
+
+    2.times { instance.words_gagged? }
+    2.times { instance.email_gagged? }
+  end
+
   describe 'when clearing gagged attributes' do
     it 'should clear gagged attributes' do
       ExampleModel.gag :words
