@@ -45,14 +45,30 @@ describe 'Plain Old Ruby Object' do
   end
 
   context 'when gagged with a callable' do
-    it 'should call callable when checking whether attribute is gagged' do
-      callable = {}
-      ExampleModel.gag :words, callable
-      instance = ExampleModel.new
-      attribute_value = instance.words
+    it 'should check whether the callable object is callable' do
+      mock_callable = mock('callable')
+      mock_callable.should_receive(:respond_to?).
+        with(:call)
+      ExampleModel.gag :words, mock_callable
+    end
 
-      callable.should_receive(:call).with(
-        hash_including(words: attribute_value), instance)
+    it 'should call callable when checking whether attribute is gagged' do
+      mock_callable = mock('callable')
+      mock_callable.stub!(:respond_to?).
+        with(:call).and_return(true)
+
+      # Create a mock for this method to verify that original
+      # object is passed through to the callable
+      mock_words = mock('words')
+
+      ExampleModel.gag :words, mock_callable
+
+      instance = ExampleModel.new
+      instance.stub!(words: mock_words)
+
+      mock_callable.should_receive(:call).
+        with(hash_including(words: mock_words), instance)
+
       instance.words_gagged?
     end
 

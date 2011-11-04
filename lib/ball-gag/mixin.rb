@@ -15,8 +15,10 @@ module BallGag
 
     def gag attribute, callable = nil, &block
       define_and_mixin_gagged_attributes_methods
-      @gagged_attributes[attribute] = callable || block ||
-        lambda { |*| raise NoEngineConfiguredError }
+      to_call = callable.respond_to?(:call) ? callable :
+        (block || lambda { |*| raise NoEngineConfiguredError })
+
+      @gagged_attributes[attribute] = to_call
 
       define_gagged_interpellation attribute, @gagged_attributes[attribute]
       define_not_gagged_interpellation attribute
