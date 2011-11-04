@@ -71,11 +71,11 @@ describe 'Plain Old Ruby Object' do
 
     mock_engine.should_receive(:call).
       with(hash_including(words: mock_words), instance).
-      once.and_return({})
+      once
 
     mock_engine.should_receive(:call).
       with(hash_including(email: mock_email), instance).
-      once.and_return({})
+      once
 
     2.times { instance.words_gagged? }
     2.times { instance.email_gagged? }
@@ -136,8 +136,7 @@ describe 'Plain Old Ruby Object' do
       instance.stub!(words: mock_words)
 
       mock_callable.should_receive(:call).
-        with(hash_including(words: mock_words), instance).
-        and_return({})
+        with(hash_including(words: mock_words), instance)
 
       instance.words_gagged?
     end
@@ -148,7 +147,6 @@ describe 'Plain Old Ruby Object' do
       ExampleModel.gag :words do |unsanitized_values, instance|
         a = unsanitized_values
         b = instance
-        {}
       end
       instance = ExampleModel.new
       attribute_value = instance.words
@@ -231,8 +229,7 @@ describe 'Plain Old Ruby Object' do
         instance.stub!(words: mock_words)
 
         mock_engine.should_receive(:call).
-          with(hash_including(words: mock_words), instance).
-          and_return({})
+          with(hash_including(words: mock_words), instance)
 
         instance.words_gagged?
       end
