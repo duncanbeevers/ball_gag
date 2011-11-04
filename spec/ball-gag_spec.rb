@@ -84,5 +84,15 @@ describe 'Plain Old Ruby Object' do
       ExampleModel.new.words_gagged?.should be_false
     end
   end
+
+  context 'when gagged with no arguments' do
+    context 'when no engine is configured' do
+      it 'should raise when checking whether attribute is gagged' do
+        ExampleModel.gag :words
+        -> { ExampleModel.new.words_gagged? }.
+          should raise_error(BallGag::NoEngineConfiguredError)
+      end
+    end
+  end
 end
 
