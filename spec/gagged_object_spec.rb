@@ -1,7 +1,10 @@
 require 'spec_helper'
 
 describe 'Plain Old Ruby Object' do
-  before { ExampleModel.clear_gagged_attributes }
+  before do
+    BallGag.engine = nil
+    ExampleModel.clear_gagged_attributes
+  end
 
   it 'should have no gagged attributes' do
     ExampleModel.gagged_attributes.should be_empty
@@ -113,6 +116,26 @@ describe 'Plain Old Ruby Object' do
         ExampleModel.gag :words
         -> { ExampleModel.new.words_gagged? }.
           should raise_error(BallGag::NoEngineConfiguredError)
+      end
+    end
+
+    context 'when configured with an engine' do
+      it 'should call engine when checking whether attribute is gagged' do
+        mock_engine = mock('engine')
+        BallGag.engine = mock_engine
+        ExampleModel.gag :words
+
+        # Create a mock for this method to verify that original
+        # object is passed through to the engine
+        mock_words = mock('words')
+
+        instance = ExampleModel.new
+        instance.stub!(words: mock_words)
+
+        mock_engine.should_receive(:call).
+          with(hash_including(words: mock_words), instance)
+
+        instance.words_gagged?
       end
     end
   end

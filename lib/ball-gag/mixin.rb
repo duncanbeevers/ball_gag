@@ -14,12 +14,15 @@ module BallGag
     end
 
     def gag *arguments, &block
-      callable = arguments.pop if arguments.last.respond_to? :call
       define_and_mixin_gagged_attributes_methods
 
+      callable = arguments.pop if arguments.last.respond_to? :call
+
+      to_call = callable || block || BallGag.engine ||
+        lambda { |*| raise NoEngineConfiguredError } 
+
       arguments.each do |attribute|
-        @gagged_attributes[attribute] = callable || block ||
-          lambda { |*| raise NoEngineConfiguredError }
+        @gagged_attributes[attribute] = to_call
 
         define_gagged_interpellation attribute, @gagged_attributes[attribute]
         define_not_gagged_interpellation attribute
