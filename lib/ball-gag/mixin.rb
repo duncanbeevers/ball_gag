@@ -22,11 +22,10 @@ module BallGag
       to_call = callable || block || BallGag.engine ||
         lambda { |*| raise NoEngineConfiguredError }
 
+      define_gagged_interpellations(arguments, to_call, options)
+
       arguments.each do |attribute|
         @gagged_attributes[attribute] = to_call
-
-        define_gagged_interpellation(
-          attribute, @gagged_attributes[attribute], options)
         define_not_gagged_interpellation attribute
       end
     end
@@ -42,13 +41,22 @@ module BallGag
       undefine_gagged_attributes_methods
     end
 
-    def define_gagged_interpellation attribute, callable, options = nil
-      fn = options ?
-        -> { callable.call({ attribute => self.send(attribute) }, self, options) } :
-        -> { callable.call({ attribute => self.send(attribute) }, self) }
+    def define_gagged_interpellations attributes, callable, options = nil
+      unsanitized_values = lambda { |instance|
+        attributes.inject({}) do |a, attribute|
+          a[attribute] = instance.send(attribute)
+          a
+        end
+      }
 
-      @gagged_attributes_methods.send(:define_method,
+      fn = options ?
+        -> { callable.call(unsanitized_values.call(self), self, options) } :
+        -> { callable.call(unsanitized_values.call(self), self) }
+
+      attributes.each do |attribute|
+        @gagged_attributes_methods.send(:define_method,
         gagged_attribute_interpellation_name(attribute), &fn)
+      end
     end
 
     def define_not_gagged_interpellation attribute
