@@ -40,8 +40,7 @@ module BallGag
       undefine_gagged_attributes_methods
     end
 
-    def define_gagged_interpellation attribute, block
-      callable = @gagged_attributes[attribute]
+    def define_gagged_interpellation attribute, callable
       @gagged_attributes_methods.send(:define_method,
         gagged_attribute_interpellation_name(attribute)) do
           callable.call({ attribute => self.send(attribute) }, self)
