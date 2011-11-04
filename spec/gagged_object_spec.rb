@@ -99,6 +99,17 @@ describe 'Plain Old Ruby Object' do
       b.should eq instance
     end
 
+    it 'should forward options to callable' do
+      passed_options = nil
+      options = { strict: true }
+      ExampleModel.gag :words, options do |_, _, options|
+        passed_options = options
+      end
+
+      ExampleModel.new.words_gagged?
+      passed_options.should eq options
+    end
+
     it 'should return true for attribute_not_gagged? if callable returns true' do
       ExampleModel.gag :words do |*| false end
       ExampleModel.new.words_not_gagged?.should be_true

@@ -17,14 +17,16 @@ module BallGag
       define_and_mixin_gagged_attributes_methods
 
       callable = arguments.pop if arguments.last.respond_to? :call
+      options = arguments.pop if arguments.last.kind_of? Hash
 
       to_call = callable || block || BallGag.engine ||
-        lambda { |*| raise NoEngineConfiguredError } 
+        lambda { |*| raise NoEngineConfiguredError }
 
       arguments.each do |attribute|
         @gagged_attributes[attribute] = to_call
 
-        define_gagged_interpellation attribute, @gagged_attributes[attribute]
+        define_gagged_interpellation(
+          attribute, @gagged_attributes[attribute], options)
         define_not_gagged_interpellation attribute
       end
     end
@@ -40,11 +42,13 @@ module BallGag
       undefine_gagged_attributes_methods
     end
 
-    def define_gagged_interpellation attribute, callable
+    def define_gagged_interpellation attribute, callable, options = nil
+      fn = options ?
+        -> { callable.call({ attribute => self.send(attribute) }, self, options) } :
+        -> { callable.call({ attribute => self.send(attribute) }, self) }
+
       @gagged_attributes_methods.send(:define_method,
-        gagged_attribute_interpellation_name(attribute)) do
-          callable.call({ attribute => self.send(attribute) }, self)
-        end
+        gagged_attribute_interpellation_name(attribute), &fn)
     end
 
     def define_not_gagged_interpellation attribute
