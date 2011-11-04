@@ -183,6 +183,29 @@ describe 'Plain Old Ruby Object' do
         ExampleModel.new.words_not_gagged?.should be_true
       end
     end
+
+    context 'when callable returns true' do
+      context 'and a single attribute is gagged' do
+        before { ExampleModel.gag :words do |*| true end }
+
+        it 'should return false for attribute_gagged?' do
+          ExampleModel.new.words_gagged?.should be_false
+        end
+
+        it 'should return true for attribute_not_gagged?' do
+          ExampleModel.new.words_not_gagged?.should be_true
+        end
+      end
+
+      context 'and multiple attributes are gagged' do
+        before { ExampleModel.gag :words, :email do |*| true end }
+
+        it 'should raise' do
+          -> { ExampleModel.new.words_gagged? }.
+            should raise_error(BallGag::BadResultsMappingError)
+        end
+      end
+    end
   end
 
   context 'when gagged with no arguments' do

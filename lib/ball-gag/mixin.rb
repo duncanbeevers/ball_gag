@@ -63,6 +63,17 @@ module BallGag
               @gagged_attribute_results[attributes] = fn.call(self)
             end
 
+            call_result = @gagged_attribute_results[attributes]
+
+            if 1 == attributes.length
+              # If only one attribute was supplied, a simple
+              # boolean response is sufficient
+              return false unless call_result
+              return true unless call_result.respond_to?(:[])
+            else
+              raise BadResultsMappingError unless call_result.respond_to?(:[])
+            end
+
             @gagged_attribute_results[attributes][attr]
           end
       end
