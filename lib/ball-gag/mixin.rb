@@ -57,7 +57,12 @@ module BallGag
         @gagged_attributes_methods.send(:define_method,
           gagged_attribute_negative_interpellation_name(attr)) do
             @gagged_attribute_results ||= {}
-            @gagged_attribute_results[attributes] ||= fn.call(self)
+
+            # Have we performed this call already?
+            unless @gagged_attribute_results.has_key?(attributes)
+              @gagged_attribute_results[attributes] = fn.call(self)
+            end
+
             @gagged_attribute_results[attributes][attr]
           end
       end
