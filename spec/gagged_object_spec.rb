@@ -41,6 +41,22 @@ describe 'Plain Old Ruby Object' do
     instance.words_gagged?
   end
 
+  it 'should cache the result of the callable' do
+    mock_callable = mock('callable')
+    mock_callable.stub!(:respond_to?).
+      with(:call).and_return(true)
+
+    ExampleModel.gag :words, :email, mock_callable
+
+    mock_callable.should_receive(:call).
+      once.and_return({})
+
+    instance = ExampleModel.new
+
+    instance.words_gagged?
+    instance.email_gagged?
+  end
+
   describe 'when clearing gagged attributes' do
     it 'should clear gagged attributes' do
       ExampleModel.gag :words
