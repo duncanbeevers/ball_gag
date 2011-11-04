@@ -21,6 +21,26 @@ describe 'Plain Old Ruby Object' do
     ExampleModel.gagged_attributes.should include :email
   end
 
+  it 'should invoke callable with all attributes' do
+    mock_callable = mock('callable')
+    mock_callable.stub!(:respond_to?).
+      with(:call).and_return(true)
+
+    mock_words = mock('words')
+    mock_email = mock('email')
+
+    ExampleModel.gag :words, :email, mock_callable
+
+    instance = ExampleModel.new
+    instance.stub!(words: mock_words, email: mock_email)
+
+    mock_callable.should_receive(:call).with(
+      hash_including(words: mock_words, email: mock_email), instance).
+      and_return({})
+
+    instance.words_gagged?
+  end
+
   describe 'when clearing gagged attributes' do
     it 'should clear gagged attributes' do
       ExampleModel.gag :words
