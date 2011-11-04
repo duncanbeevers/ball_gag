@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email       = ['duncan@dweebd.com']
   s.homepage    = ''
   s.summary     = 'Pluggable Content Sanitization'
-  s.description = 'Sanitize user input using with pluggable back-ends'
+  s.description = 'Sanitize user input using pluggable back-ends'
 
   s.rubyforge_project = 'ball-gag'
 
