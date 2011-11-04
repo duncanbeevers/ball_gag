@@ -12,6 +12,12 @@ describe 'Plain Old Ruby Object' do
     ExampleModel.gagged_attributes.should include :words
   end
 
+  it 'should gag multiple attributes' do
+    ExampleModel.gag :words, :email
+    ExampleModel.gagged_attributes.should include :words
+    ExampleModel.gagged_attributes.should include :email
+  end
+
   describe 'when clearing gagged attributes' do
     it 'should clear gagged attributes' do
       ExampleModel.gag :words

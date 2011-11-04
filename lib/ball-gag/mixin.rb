@@ -13,15 +13,17 @@ module BallGag
       @gagged_attributes.keys
     end
 
-    def gag attribute, callable = nil, &block
+    def gag *arguments, &block
+      callable = arguments.pop if arguments.last.respond_to? :call
       define_and_mixin_gagged_attributes_methods
-      to_call = callable.respond_to?(:call) ? callable :
-        (block || lambda { |*| raise NoEngineConfiguredError })
 
-      @gagged_attributes[attribute] = to_call
+      arguments.each do |attribute|
+        @gagged_attributes[attribute] = callable || block ||
+          lambda { |*| raise NoEngineConfiguredError }
 
-      define_gagged_interpellation attribute, @gagged_attributes[attribute]
-      define_not_gagged_interpellation attribute
+        define_gagged_interpellation attribute, @gagged_attributes[attribute]
+        define_not_gagged_interpellation attribute
+      end
     end
 
     def clear_gagged_attributes
