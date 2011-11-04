@@ -51,7 +51,7 @@ describe 'Plain Old Ruby Object' do
       instance = ExampleModel.new
       attribute_value = instance.words
 
-      callable.should_receive(:call).with({ :words => attribute_value }, instance)
+      callable.should_receive(:call).with({ words: attribute_value }, instance)
       instance.words_gagged?
     end
 
@@ -66,7 +66,7 @@ describe 'Plain Old Ruby Object' do
       attribute_value = instance.words
 
       instance.words_gagged?
-      a.should == { :words => attribute_value }
+      a.should == { words: attribute_value }
       b.should == instance
     end
 
