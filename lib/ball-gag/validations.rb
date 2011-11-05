@@ -6,9 +6,19 @@ module BallGag
 
     module ClassMethods
       def validates_gag *args, &block
+        messages_map = nil
+        if args.first.kind_of?(Hash)
+          messages_map = args.shift
+          args = messages_map.keys + args
+        end
+
         gag(*args, &block).each do |attribute|
           validate attribute do
-            errors.add(attribute) if self.method("#{attribute}_gagged?").call
+            if self.method("#{attribute}_gagged?").call
+              messages_map ?
+                errors.add(attribute, messages_map[attribute]) :
+                errors.add(attribute)
+            end
           end
         end
       end

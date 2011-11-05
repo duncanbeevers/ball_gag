@@ -36,5 +36,17 @@ describe ExampleActiveModel do
       and_return(true)
     instance.should_not be_valid
   end
+
+  it 'uses hash to define validations and failure message' do
+    mock_failure_message = mock('are not appropriate')
+    mock_failure_message.stub!(:empty?)
+
+    ExampleActiveModel.validates_gag({ words: mock_failure_message })
+    instance = ExampleActiveModel.new
+    instance.should_receive(:words_gagged?).
+      and_return(true)
+    instance.valid?
+    instance.errors[:words].should include mock_failure_message
+  end
 end
 
