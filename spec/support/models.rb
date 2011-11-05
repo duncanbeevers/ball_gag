@@ -13,6 +13,7 @@ end
 class ExampleActiveModel
   include ActiveModel::Validations
   include BallGag
+  include BallGag::Validations
 
   validate :words_not_gagged?
 
