@@ -15,8 +15,6 @@ class ExampleActiveModel
   include BallGag
   include BallGag::Validations
 
-  validate :words_not_gagged?
-
   def words
     'Welcome to the place where all the creatures meet.'
   end

@@ -28,6 +28,8 @@ module BallGag
         @gagged_attributes[attribute] = to_call
         define_gagged_interpellation attribute
       end
+
+      arguments
     end
 
     def clear_gagged_attributes
