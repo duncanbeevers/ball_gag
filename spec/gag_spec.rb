@@ -121,42 +121,119 @@ describe ExampleModel do
     end
 
     context 'when callable is of arity 2' do
-      it 'callable is called with options' do
-        mock_words = mock('words')
-        mock_options = mock('options')
-        mock_options.should_receive(:kind_of?).
-          with(Hash).and_return(true)
+      context 'and options are supplied' do
+        it 'callable is called with options' do
+          mock_words = mock('words')
+          mock_options = mock('options')
+          mock_options.should_receive(:kind_of?).
+            with(Hash).and_return(true)
 
-        callable = lambda { |words, options| }
-        ExampleModel.gag :words, mock_options, callable
+          callable = lambda { |words, options| }
+          ExampleModel.gag :words, mock_options, callable
 
-        callable.should_receive(:call).
-          with(mock_words, mock_options)
+          callable.should_receive(:call).
+            with(mock_words, mock_options)
 
-        instance = ExampleModel.new
-        instance.stub!(words: mock_words)
+          instance = ExampleModel.new
+          instance.stub!(words: mock_words)
 
-        instance.words_gagged?
+          instance.words_gagged?
+        end
+      end
+
+      context 'and options are not supplied' do
+        it 'callable is called with instance' do
+          mock_words = mock('words')
+          
+          callable = lambda { |words, instance| }
+          ExampleModel.gag :words, callable
+
+          instance = ExampleModel.new
+          instance.stub!(words: mock_words)
+
+          callable.should_receive(:call).
+            with(mock_words, instance)
+
+          instance.words_gagged?
+        end
       end
     end
 
     context 'when callable is of arity 3' do
-      it 'callable is called with instance and options' do
-        mock_words = mock('words')
-        mock_options = mock('options')
-        mock_options.should_receive(:kind_of?).
-          with(Hash).and_return(true)
+      context 'and options are supplied' do
+        it 'callable is called with instance and options' do
+          mock_words = mock('words')
+          mock_options = mock('options')
+          mock_options.should_receive(:kind_of?).
+            with(Hash).and_return(true)
 
-        callable = lambda { |words, instance, options| }
-        ExampleModel.gag :words, mock_options, callable
+          callable = lambda { |words, instance, options| }
+          ExampleModel.gag :words, mock_options, callable
 
-        instance = ExampleModel.new
-        instance.stub!(words: mock_words)
+          instance = ExampleModel.new
+          instance.stub!(words: mock_words)
 
-        callable.should_receive(:call).
-          with(mock_words, instance, mock_options)
+          callable.should_receive(:call).
+            with(mock_words, instance, mock_options)
 
-        instance.words_gagged?
+          instance.words_gagged?
+        end
+      end
+
+      context 'and options are not supplied' do
+        it 'callable is called with instance and attribute' do
+          mock_words = mock('words')
+          
+          callable = lambda { |words, instance, attribute| }
+          ExampleModel.gag :words, callable
+
+          instance = ExampleModel.new
+          instance.stub!(words: mock_words)
+
+          callable.should_receive(:call).
+            with(mock_words, instance, :words)
+
+          instance.words_gagged?
+        end
+      end
+    end
+
+    context 'when callable is of arity 4' do
+      context 'and options are supplied' do
+        it 'callable is called with instance, options, and attribute' do
+          mock_options = mock('options')
+          mock_options.should_receive(:kind_of?).
+            with(Hash).and_return(true)
+          mock_words = mock('words')
+
+          callable = lambda { |words, instance, options, attribute| }
+          ExampleModel.gag :words, mock_options, callable
+
+          instance = ExampleModel.new
+          instance.stub!(words: mock_words)
+
+          callable.should_receive(:call).
+            with(mock_words, instance, mock_options, :words)
+
+          instance.words_gagged?
+        end
+      end
+
+      context 'and options are not supplied' do
+        it 'callable is called with instance, empty options and attribute' do
+          mock_words = mock('words')
+
+          callable = lambda { |words, instance, options, attribute| }
+          ExampleModel.gag :words, callable
+
+          instance = ExampleModel.new
+          instance.stub!(words: mock_words)
+
+          callable.should_receive(:call).
+            with(mock_words, instance, {}, :words)
+
+          instance.words_gagged?
+        end
       end
     end
   end

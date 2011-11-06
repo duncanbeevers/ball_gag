@@ -65,6 +65,10 @@ module BallGag
         lambda { |it, attr| callable.call(output.call(it, attr)) }
       when 2
         lambda { |it, attr| callable.call(output.call(it, attr), options || it) }
+      when 3
+        lambda { |it, attr| callable.call(output.call(it, attr), it, options || attr) }
+      when 4
+        lambda { |it, attr| callable.call(output.call(it, attr), it, options || {}, attr) }
       else
         options ?
           lambda { |it, attr| callable.call(output.call(it, attr), it, options) } :
