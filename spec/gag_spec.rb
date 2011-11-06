@@ -101,6 +101,23 @@ describe ExampleModel do
 
         instance.words_gagged?
       end
+
+      context 'and options are supplied' do
+        it 'callable is called without options or instance' do
+          mock_words = mock('words')
+
+          callable = lambda { |words| }
+          ExampleModel.gag :words, { strict: true }, callable
+
+          callable.should_receive(:call).
+            with(mock_words)
+
+          instance = ExampleModel.new
+          instance.stub(words: mock_words)
+
+          instance.words_gagged?
+        end
+      end
     end
 
     context 'when callable is of arity 2' do

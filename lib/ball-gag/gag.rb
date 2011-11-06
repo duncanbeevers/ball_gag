@@ -57,7 +57,11 @@ module BallGag
 
       fn = nil
       if options
-        if 2 == callable.arity
+        if 1 == callable.arity
+          fn = lambda do |it, attr|
+            callable.call(output.call(it, attr))
+          end
+        elsif 2 == callable.arity
           fn = lambda do |it, attr|
             callable.call(output.call(it, attr), options)
           end
