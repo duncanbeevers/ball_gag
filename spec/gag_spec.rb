@@ -185,11 +185,11 @@ describe ExampleModel do
       instance.stub!(words: mock_words, email: mock_email)
 
       callable.should_receive(:call).
-        with(hash_including(words: mock_words), instance).
+        with({words: mock_words}, instance).
         once
 
       callable.should_receive(:call).
-        with(hash_including(email: mock_email), instance).
+        with({email: mock_email}, instance).
         once
 
       2.times { instance.words_gagged? }
