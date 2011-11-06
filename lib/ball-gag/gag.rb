@@ -54,22 +54,46 @@ module BallGag
       fn = nil
       if options
         if 2 == callable.arity
-          fn = lambda do |it|
-            callable.call(unsanitized_values.call(it), options)
+          if 1 == attributes.length
+            fn = lambda do |it, attr|
+              callable.call(unsanitized_values.call(it)[attr], options)
+            end
+          else
+            fn = lambda do |it, _|
+              callable.call(unsanitized_values.call(it), options)
+            end
           end
         else
-          fn = lambda do |it|
-            callable.call(unsanitized_values.call(it), it, options)
+          if 1 == attributes.length
+            fn = lambda do |it, attr|
+              callable.call(unsanitized_values.call(it)[attr], it, options)
+            end
+          else
+            fn = lambda do |it, _|
+              callable.call(unsanitized_values.call(it), it, options)
+            end
           end
         end
       else
         if 1 == callable.arity
-          fn = lambda do |it|
-            callable.call(unsanitized_values.call(it))
+          if 1 == attributes.length
+            fn = lambda do |it, attr|
+              callable.call(unsanitized_values.call(it)[attr])
+            end
+          else
+            fn = lambda do |it, _|
+              callable.call(unsanitized_values.call(it))
+            end
           end
         else
-          fn = lambda do |it|
-            callable.call(unsanitized_values.call(it), it)
+          if 1 == attributes.length
+            fn = lambda do |it, attr|
+              callable.call(unsanitized_values.call(it)[attr], it)
+            end
+          else
+            fn = lambda do |it, _|
+              callable.call(unsanitized_values.call(it), it)
+            end
           end
         end
       end
@@ -81,7 +105,7 @@ module BallGag
 
             # Have we performed this call already?
             unless @gagged_attribute_results.has_key?(attributes)
-              @gagged_attribute_results[attributes] = fn.call(self)
+              @gagged_attribute_results[attributes] = fn.call(self, attr)
             end
 
             call_result = @gagged_attribute_results[attributes]

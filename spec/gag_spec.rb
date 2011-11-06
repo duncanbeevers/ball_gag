@@ -94,7 +94,7 @@ describe ExampleModel do
         ExampleModel.gag :words, callable
 
         callable.should_receive(:call).
-          with(hash_including(words: mock_words))
+          with(mock_words)
 
         instance = ExampleModel.new
         instance.stub!(words: mock_words)
@@ -114,10 +114,30 @@ describe ExampleModel do
         ExampleModel.gag :words, mock_options, callable
 
         callable.should_receive(:call).
-          with(hash_including(words: mock_words), mock_options)
+          with(mock_words, mock_options)
 
         instance = ExampleModel.new
         instance.stub!(words: mock_words)
+
+        instance.words_gagged?
+      end
+    end
+
+    context 'when callable is of arity 3' do
+      it 'callable is called with instance and options' do
+        mock_words = mock('words')
+        mock_options = mock('options')
+        mock_options.should_receive(:kind_of?).
+          with(Hash).and_return(true)
+
+        callable = lambda { |words, instance, options| }
+        ExampleModel.gag :words, mock_options, callable
+
+        instance = ExampleModel.new
+        instance.stub!(words: mock_words)
+
+        callable.should_receive(:call).
+          with(mock_words, instance, mock_options)
 
         instance.words_gagged?
       end
@@ -160,8 +180,8 @@ describe ExampleModel do
     it 'should call block when checking whether attribute is gagged' do
       a = nil
       b = nil
-      ExampleModel.gag :words do |unsanitized_values, instance|
-        a = unsanitized_values
+      ExampleModel.gag :words do |words, instance|
+        a = words
         b = instance
       end
       instance = ExampleModel.new
@@ -169,9 +189,7 @@ describe ExampleModel do
 
       instance.words_gagged?
 
-      a.should have_key(:words)
-      a[:words].should eq attribute_value
-
+      a.should eq attribute_value
       b.should eq instance
     end
   end
@@ -198,7 +216,7 @@ describe ExampleModel do
       instance.stub!(words: mock_words)
 
       callable.should_receive(:call).
-        with(hash_including(words: mock_words), instance)
+        with(mock_words, instance)
 
       instance.words_gagged?
     end
@@ -257,11 +275,11 @@ describe ExampleModel do
       instance.stub!(words: mock_words, email: mock_email)
 
       callable.should_receive(:call).
-        with({words: mock_words}, instance).
+        with(mock_words, instance).
         once
 
       callable.should_receive(:call).
-        with({email: mock_email}, instance).
+        with(mock_email, instance).
         once
 
       2.times { instance.words_gagged? }
