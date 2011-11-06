@@ -142,7 +142,7 @@ describe ExampleModel do
       2.times { instance.words_gagged? }
     end
 
-    it 'should cache separate gaggings' do
+    it 'should separate invocations and cache results' do
       callable = lambda {}
       mock_words = mock('words')
       mock_email = mock('email')
