@@ -187,8 +187,11 @@ describe ExampleModel do
 
   context 'when gagged with a callable object' do
     it 'should check if object is callable' do
-      callable = {}
-      callable.should_receive(:respond_to?).with(:call)
+      callable = Class.new
+      callable.should_receive(:respond_to?).
+        with(:call).and_return(true)
+      callable.should_not_receive(:call)
+
       ExampleModel.gag :words, callable
     end
   end

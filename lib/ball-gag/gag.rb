@@ -56,7 +56,11 @@ module BallGag
         lambda { |it, attr| unsanitized_values.call(it)[attr] } :
         lambda { |it, attr| unsanitized_values.call(it) }
 
-      fn = case callable.arity
+      arity = callable.respond_to?(:arity) ?
+        callable.arity :
+        callable.method(:call).arity.abs
+
+      fn = case arity
       when 1
         lambda { |it, attr| callable.call(output.call(it, attr)) }
       when 2

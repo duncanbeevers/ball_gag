@@ -12,5 +12,11 @@ describe BallGag do
     BallGag.engine = mock_engine
     BallGag.engine.should eq mock_engine
   end
+
+  it 'should use engine' do
+    BallGag.engine = ExampleEngine
+    ExampleModel.gag :words, { strict: true }
+    ExampleModel.new.words_gagged?.should be_false
+  end
 end
 

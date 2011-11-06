@@ -24,3 +24,11 @@ class ExampleActiveModel
   end
 end
 
+class ExampleEngine
+  class << self
+    def call value, options = {}
+      true
+    end
+  end
+end
+
