@@ -1,101 +1,55 @@
 require 'spec_helper'
 
-describe 'Plain Old Ruby Object' do
+describe ExampleModel do
   before do
     BallGag.engine = nil
     ExampleModel.clear_gagged_attributes
   end
 
-  it 'should have no gagged attributes' do
-    ExampleModel.gagged_attributes.should be_empty
+  describe '#gag' do
+    it 'should add #{attribute}_gagged? method' do
+      ExampleModel.gag :words
+      ExampleModel.new.should respond_to :words_gagged?
+    end
+
+    it 'should add #{attribute}_not_gagged? method' do
+      ExampleModel.gag :words
+      ExampleModel.new.should respond_to :words_not_gagged?
+    end
   end
 
-  it 'should gag attribute' do
-    ExampleModel.gag :words
-    ExampleModel.gagged_attributes.should include :words
+  describe '#gagged_attributes' do
+    it 'should have no gagged attributes' do
+      ExampleModel.gagged_attributes.should be_empty
+    end
+
+    it 'should gag attribute' do
+      ExampleModel.gag :words
+      ExampleModel.gagged_attributes.should include :words
+    end
+
+    it 'should gag multiple attributes' do
+      ExampleModel.gag :words, :email
+      ExampleModel.gagged_attributes.should include :words
+      ExampleModel.gagged_attributes.should include :email
+    end
   end
 
-  it 'should gag multiple attributes' do
-    ExampleModel.gag :words, :email
-    ExampleModel.gagged_attributes.should include :words
-    ExampleModel.gagged_attributes.should include :email
-  end
-
-  it 'should invoke callable with all attributes' do
-    mock_callable = mock('callable')
-    mock_callable.stub!(:respond_to?).
-      with(:call).and_return(true)
-
-    mock_words = mock('words')
-    mock_email = mock('email')
-
-    ExampleModel.gag :words, :email, mock_callable
-
-    instance = ExampleModel.new
-    instance.stub!(words: mock_words, email: mock_email)
-
-    mock_callable.should_receive(:call).with(
-      hash_including(words: mock_words, email: mock_email), instance).
-      and_return({})
-
-    instance.words_gagged?
-  end
-
-  it 'should cache the result of the callable' do
-    mock_callable = mock('callable')
-    mock_callable.stub!(:respond_to?).
-      with(:call).and_return(true)
-
-    ExampleModel.gag :words, :email, mock_callable
-
-    mock_callable.should_receive(:call).
-      once.and_return({})
-
-    instance = ExampleModel.new
-
-    instance.words_gagged?
-    instance.email_gagged?
-  end
-
-  it 'should cache separate gaggings' do
-    mock_engine = mock('engine')
-    mock_words = mock('words')
-    mock_email = mock('email')
-    BallGag.engine = mock_engine
-
-    ExampleModel.gag :words
-    ExampleModel.gag :email
-
-    instance = ExampleModel.new
-    instance.stub!(words: mock_words, email: mock_email)
-
-    mock_engine.should_receive(:call).
-      with(hash_including(words: mock_words), instance).
-      once
-
-    mock_engine.should_receive(:call).
-      with(hash_including(email: mock_email), instance).
-      once
-
-    2.times { instance.words_gagged? }
-    2.times { instance.email_gagged? }
-  end
-
-  describe 'when clearing gagged attributes' do
+  describe '#clear_gagged_attributes' do
     it 'should clear gagged attributes' do
       ExampleModel.gag :words
       ExampleModel.clear_gagged_attributes
       ExampleModel.gagged_attributes.should be_empty
     end
 
-    it 'should remove attribute_not_gagged? method' do
+    it 'should remove #{attribute}_not_gagged? method' do
       ExampleModel.gag :words
       ExampleModel.new.should respond_to(:words_not_gagged?)
       ExampleModel.clear_gagged_attributes
       ExampleModel.new.should_not respond_to(:words_not_gagged?)
     end
 
-    it 'should remove attribute_gagged? method' do
+    it 'should remove #{attribute}_gagged? method' do
       ExampleModel.gag :words
       ExampleModel.new.should respond_to(:words_gagged?)
       ExampleModel.clear_gagged_attributes
@@ -103,14 +57,76 @@ describe 'Plain Old Ruby Object' do
     end
   end
 
-  it 'should add new attribute_gagged? method' do
-    ExampleModel.gag :words
-    ExampleModel.new.should respond_to :words_gagged?
+  context 'when gagged with no callable' do
+    it 'should raise when no engine is configured' do
+      ExampleModel.gag :words
+
+      -> { ExampleModel.new.words_gagged? }.
+        should raise_error(BallGag::NoEngineConfiguredError)
+    end
+
+    it 'should call engine when one is configured' do
+      BallGag.engine = lambda { |unsanitized_attributes, instance| }
+      ExampleModel.gag :words
+
+      BallGag.engine.should_receive(:call)
+      ExampleModel.new.words_gagged?
+    end
   end
 
-  it 'should add new attribute_not_gagged? method' do
-    ExampleModel.gag :words
-    ExampleModel.new.should respond_to :words_not_gagged?
+  context 'when multiple attributes are gagged' do
+    it 'should invoke callable with all attributes and instance' do
+      callable = lambda {}
+      ExampleModel.gag :words, :email, callable
+
+      instance = ExampleModel.new
+
+      mock_words = mock('words')
+      mock_email = mock('email')
+      instance.stub!(words: mock_words, email: mock_email)
+
+      callable.should_receive(:call).with(
+        hash_including(words: mock_words, email: mock_email), instance).
+        and_return({})
+
+      instance.words_gagged?
+    end
+  end
+
+  describe 'callable result caching' do
+    it 'should cache the result of the callable' do
+      callable = lambda {}
+      ExampleModel.gag :words, callable
+
+      callable.should_receive(:call).once
+
+      instance = ExampleModel.new
+      2.times { instance.words_gagged? }
+    end
+
+    it 'should cache separate gaggings' do
+      mock_engine = mock('engine')
+      mock_words = mock('words')
+      mock_email = mock('email')
+      BallGag.engine = mock_engine
+
+      ExampleModel.gag :words
+      ExampleModel.gag :email
+
+      instance = ExampleModel.new
+      instance.stub!(words: mock_words, email: mock_email)
+
+      mock_engine.should_receive(:call).
+        with(hash_including(words: mock_words), instance).
+        once
+
+      mock_engine.should_receive(:call).
+        with(hash_including(email: mock_email), instance).
+        once
+
+      2.times { instance.words_gagged? }
+      2.times { instance.email_gagged? }
+    end
   end
 
   context 'when gagged with a callable' do
@@ -202,36 +218,6 @@ describe 'Plain Old Ruby Object' do
           -> { ExampleModel.new.words_gagged? }.
             should raise_error(BallGag::BadResultsMappingError)
         end
-      end
-    end
-  end
-
-  context 'when gagged with no arguments' do
-    context 'when no engine is configured' do
-      it 'should raise when checking whether attribute is gagged' do
-        ExampleModel.gag :words
-        -> { ExampleModel.new.words_gagged? }.
-          should raise_error(BallGag::NoEngineConfiguredError)
-      end
-    end
-
-    context 'when configured with an engine' do
-      it 'should call engine when checking whether attribute is gagged' do
-        mock_engine = mock('engine')
-        BallGag.engine = mock_engine
-        ExampleModel.gag :words
-
-        # Create a mock for this method to verify that original
-        # object is passed through to the engine
-        mock_words = mock('words')
-
-        instance = ExampleModel.new
-        instance.stub!(words: mock_words)
-
-        mock_engine.should_receive(:call).
-          with(hash_including(words: mock_words), instance)
-
-        instance.words_gagged?
       end
     end
   end
