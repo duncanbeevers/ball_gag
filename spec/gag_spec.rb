@@ -302,18 +302,10 @@ describe ExampleModel do
 
     it 'should call callable when checking whether attribute is gagged' do
       callable = lambda {}
-
-      # Create a mock for this method to verify that original
-      # object is passed through to the callable
-      mock_words = mock('words')
-
       ExampleModel.gag :words, callable
 
       instance = ExampleModel.new
-      instance.stub!(words: mock_words)
-
-      callable.should_receive(:call).
-        with(mock_words, instance)
+      callable.should_receive(:call)
 
       instance.words_gagged?
     end
@@ -332,7 +324,7 @@ describe ExampleModel do
 
   context 'when multiple attributes are gagged' do
     it 'should invoke callable with all attributes and instance' do
-      callable = lambda {}
+      callable = lambda { |map, instance| }
       ExampleModel.gag :words, :email, callable
 
       instance = ExampleModel.new
@@ -361,7 +353,7 @@ describe ExampleModel do
     end
 
     it 'should separate invocations and cache results' do
-      callable = lambda {}
+      callable = lambda { |words, instance| }
       mock_words = mock('words')
       mock_email = mock('email')
 

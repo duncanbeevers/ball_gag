@@ -62,17 +62,23 @@ module BallGag
 
       fn = case arity
       when 1
-        lambda { |it, attr| callable.call(output.call(it, attr)) }
+        lambda { |it, attr|
+          callable.call(output.call(it, attr)) }
       when 2
-        lambda { |it, attr| callable.call(output.call(it, attr), options || it) }
+        lambda { |it, attr|
+          callable.call(output.call(it, attr), options || it) }
       when 3
-        lambda { |it, attr| callable.call(output.call(it, attr), it, options || attr) }
+        lambda { |it, attr|
+          callable.call(output.call(it, attr), it, options || attr) }
       when 4
-        lambda { |it, attr| callable.call(output.call(it, attr), it, options || {}, attr) }
+        lambda { |it, attr|
+          callable.call(output.call(it, attr), it, options || {}, attr) }
       else
         options ?
-          lambda { |it, attr| callable.call(output.call(it, attr), it, options) } :
-          lambda { |it, attr| callable.call(output.call(it, attr), it) }
+          lambda { |it, attr|
+            callable.call(output.call(it, attr), it, options, attr) } :
+          lambda { |it, attr|
+            callable.call(output.call(it, attr), it, attr) }
       end
 
       attributes.each do |attr|
