@@ -51,9 +51,22 @@ module BallGag
         end
       }
 
-      fn = options ?
-        lambda { |it| callable.call(unsanitized_values.call(it), it, options) } :
-        lambda { |it| callable.call(unsanitized_values.call(it), it) }
+      fn = nil
+      if options
+        fn = lambda do |it|
+          callable.call(unsanitized_values.call(it), it, options)
+        end
+      else
+        if 1 == callable.arity
+          fn = lambda do |it|
+            callable.call(unsanitized_values.call(it))
+          end
+        else
+          fn = lambda do |it|
+            callable.call(unsanitized_values.call(it), it)
+          end
+        end
+      end
 
       attributes.each do |attr|
         @gagged_attributes_methods.send(:define_method,

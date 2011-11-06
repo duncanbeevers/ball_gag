@@ -85,6 +85,23 @@ describe ExampleModel do
         end
       end
     end
+
+    context 'when callable is of arity 1' do
+      it 'callable is called without instance' do
+        mock_words = mock('words')
+
+        callable = lambda { |words| }
+        ExampleModel.gag :words, callable
+
+        callable.should_receive(:call).
+          with(hash_including(words: mock_words))
+
+        instance = ExampleModel.new
+        instance.stub!(words: mock_words)
+
+        instance.words_gagged?
+      end
+    end
   end
 
   describe 'multiple attributes gagged' do
@@ -149,20 +166,18 @@ describe ExampleModel do
     end
 
     it 'should call callable when checking whether attribute is gagged' do
-      mock_callable = mock('callable')
-      mock_callable.stub!(:respond_to?).
-        with(:call).and_return(true)
+      callable = lambda {}
 
       # Create a mock for this method to verify that original
       # object is passed through to the callable
       mock_words = mock('words')
 
-      ExampleModel.gag :words, mock_callable
+      ExampleModel.gag :words, callable
 
       instance = ExampleModel.new
       instance.stub!(words: mock_words)
 
-      mock_callable.should_receive(:call).
+      callable.should_receive(:call).
         with(hash_including(words: mock_words), instance)
 
       instance.words_gagged?
