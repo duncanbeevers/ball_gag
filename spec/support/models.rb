@@ -13,14 +13,9 @@ end
 class ExampleActiveModel
   include ActiveModel::Validations
   include BallGag
-  include BallGag::Validations
 
   def words
     'Welcome to the place where all the creatures meet.'
-  end
-
-  def email
-    'dagan@example.com'
   end
 end
 
