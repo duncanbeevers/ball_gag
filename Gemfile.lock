@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ball-gag (0.0.1)
+    ball_gag (0.0.1)
 
 GEM
   remote: http://rubygems.org/
@@ -59,7 +59,7 @@ PLATFORMS
 
 DEPENDENCIES
   activemodel
-  ball-gag!
+  ball_gag!
   growl_notify
   guard
   guard-rspec

@@ -7,7 +7,7 @@ Spork.prefork do
 end
 
 Spork.each_run do
-  require 'ball-gag'
+  require 'ball_gag'
   require File.join(File.dirname(__FILE__), 'support/models')
 end
 

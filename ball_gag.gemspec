@@ -1,17 +1,17 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib', __FILE__)
-require 'ball-gag/version'
+require 'ball_gag/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'ball-gag'
-  s.version     = Ball::Gag::VERSION
+  s.name        = 'ball_gag'
+  s.version     = BallGag::VERSION
   s.authors     = ['Duncan Beevers']
   s.email       = ['duncan@dweebd.com']
   s.homepage    = ''
   s.summary     = 'Pluggable Content Sanitization'
   s.description = 'Sanitize user input using pluggable back-ends'
 
-  s.rubyforge_project = 'ball-gag'
+  s.rubyforge_project = 'ball_gag'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
