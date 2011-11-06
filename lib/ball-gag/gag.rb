@@ -55,31 +55,15 @@ module BallGag
         lambda { |it, attr| unsanitized_values.call(it)[attr] } :
         lambda { |it, attr| unsanitized_values.call(it) }
 
-      fn = nil
-      if options
-        if 1 == callable.arity
-          fn = lambda do |it, attr|
-            callable.call(output.call(it, attr))
-          end
-        elsif 2 == callable.arity
-          fn = lambda do |it, attr|
-            callable.call(output.call(it, attr), options)
-          end
-        else
-          fn = lambda do |it, attr|
-            callable.call(output.call(it, attr), it, options)
-          end
-        end
+      fn = case callable.arity
+      when 1
+        lambda { |it, attr| callable.call(output.call(it, attr)) }
+      when 2
+        lambda { |it, attr| callable.call(output.call(it, attr), options || it) }
       else
-        if 1 == callable.arity
-          fn = lambda do |it, attr|
-            callable.call(output.call(it, attr))
-          end
-        else
-          fn = lambda do |it, attr|
-            callable.call(output.call(it, attr), it)
-          end
-        end
+        options ?
+          lambda { |it, attr| callable.call(output.call(it, attr), it, options) } :
+          lambda { |it, attr| callable.call(output.call(it, attr), it) }
       end
 
       attributes.each do |attr|
