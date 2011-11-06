@@ -51,49 +51,29 @@ module BallGag
         end
       }
 
+      output = 1 == attributes.length ?
+        lambda { |it, attr| unsanitized_values.call(it)[attr] } :
+        lambda { |it, attr| unsanitized_values.call(it) }
+
       fn = nil
       if options
         if 2 == callable.arity
-          if 1 == attributes.length
-            fn = lambda do |it, attr|
-              callable.call(unsanitized_values.call(it)[attr], options)
-            end
-          else
-            fn = lambda do |it, _|
-              callable.call(unsanitized_values.call(it), options)
-            end
+          fn = lambda do |it, attr|
+            callable.call(output.call(it, attr), options)
           end
         else
-          if 1 == attributes.length
-            fn = lambda do |it, attr|
-              callable.call(unsanitized_values.call(it)[attr], it, options)
-            end
-          else
-            fn = lambda do |it, _|
-              callable.call(unsanitized_values.call(it), it, options)
-            end
+          fn = lambda do |it, attr|
+            callable.call(output.call(it, attr), it, options)
           end
         end
       else
         if 1 == callable.arity
-          if 1 == attributes.length
-            fn = lambda do |it, attr|
-              callable.call(unsanitized_values.call(it)[attr])
-            end
-          else
-            fn = lambda do |it, _|
-              callable.call(unsanitized_values.call(it))
-            end
+          fn = lambda do |it, attr|
+            callable.call(output.call(it, attr))
           end
         else
-          if 1 == attributes.length
-            fn = lambda do |it, attr|
-              callable.call(unsanitized_values.call(it)[attr], it)
-            end
-          else
-            fn = lambda do |it, _|
-              callable.call(unsanitized_values.call(it), it)
-            end
+          fn = lambda do |it, attr|
+            callable.call(output.call(it, attr), it)
           end
         end
       end
