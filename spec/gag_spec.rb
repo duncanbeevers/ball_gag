@@ -67,7 +67,7 @@ describe ExampleModel do
         it '#{attribute}_gagged? should be false' do
           ExampleModel.new.words_gagged?.should be_false
         end
-        it '#{attribute}_gagged? should be true' do
+        it '#{attribute}_not_gagged? should be true' do
           ExampleModel.new.words_not_gagged?.should be_true
         end
       end
@@ -80,7 +80,7 @@ describe ExampleModel do
         it '#{attribute}_gagged? should be true' do
           ExampleModel.new.words_gagged?.should be_true
         end
-        it '#{attribute}_gagged? should be false' do
+        it '#{attribute}_not_gagged? should be false' do
           ExampleModel.new.words_not_gagged?.should be_false
         end
       end
