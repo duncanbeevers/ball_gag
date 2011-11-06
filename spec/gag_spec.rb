@@ -102,6 +102,37 @@ describe ExampleModel do
       callable.should_receive(:call)
       ExampleModel.new.words_gagged?
     end
+
+    it 'should call callable when checking whether attribute is gagged' do
+      mock_callable = mock('callable')
+      mock_callable.stub!(:respond_to?).
+        with(:call).and_return(true)
+
+      # Create a mock for this method to verify that original
+      # object is passed through to the callable
+      mock_words = mock('words')
+
+      ExampleModel.gag :words, mock_callable
+
+      instance = ExampleModel.new
+      instance.stub!(words: mock_words)
+
+      mock_callable.should_receive(:call).
+        with(hash_including(words: mock_words), instance)
+
+      instance.words_gagged?
+    end
+
+    it 'should forward options to callable' do
+      passed_options = nil
+      options = { strict: true }
+      ExampleModel.gag :words, options do |_, _, options|
+        passed_options = options
+      end
+
+      ExampleModel.new.words_gagged?
+      passed_options.should eq options
+    end
   end
 
   context 'when gagged with a callable object' do
@@ -167,44 +198,6 @@ describe ExampleModel do
   end
 
   context 'when gagged with a callable' do
-    it 'should check whether the callable object is callable' do
-      mock_callable = mock('callable')
-      mock_callable.should_receive(:respond_to?).
-        with(:call)
-      ExampleModel.gag :words, mock_callable
-    end
-
-    it 'should call callable when checking whether attribute is gagged' do
-      mock_callable = mock('callable')
-      mock_callable.stub!(:respond_to?).
-        with(:call).and_return(true)
-
-      # Create a mock for this method to verify that original
-      # object is passed through to the callable
-      mock_words = mock('words')
-
-      ExampleModel.gag :words, mock_callable
-
-      instance = ExampleModel.new
-      instance.stub!(words: mock_words)
-
-      mock_callable.should_receive(:call).
-        with(hash_including(words: mock_words), instance)
-
-      instance.words_gagged?
-    end
-
-    it 'should forward options to callable' do
-      passed_options = nil
-      options = { strict: true }
-      ExampleModel.gag :words, options do |_, _, options|
-        passed_options = options
-      end
-
-      ExampleModel.new.words_gagged?
-      passed_options.should eq options
-    end
-
     context 'when callable provides true for attribute' do
       before { ExampleModel.gag :words do |*| { words: true } end }
 
