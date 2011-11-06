@@ -102,6 +102,26 @@ describe ExampleModel do
         instance.words_gagged?
       end
     end
+
+    context 'when callable is of arity 2' do
+      it 'callable is called with options' do
+        mock_words = mock('words')
+        mock_options = mock('options')
+        mock_options.should_receive(:kind_of?).
+          with(Hash).and_return(true)
+
+        callable = lambda { |words, options| }
+        ExampleModel.gag :words, mock_options, callable
+
+        callable.should_receive(:call).
+          with(hash_including(words: mock_words), mock_options)
+
+        instance = ExampleModel.new
+        instance.stub!(words: mock_words)
+
+        instance.words_gagged?
+      end
+    end
   end
 
   describe 'multiple attributes gagged' do
