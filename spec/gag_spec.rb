@@ -57,20 +57,65 @@ describe ExampleModel do
     end
   end
 
-  context 'when gagged with no callable' do
-    it 'should raise when no engine is configured' do
-      ExampleModel.gag :words
+  describe 'single attribute gagged' do
+    context 'when callable returns' do
+      context 'true' do
+        before do
+          ExampleModel.gag :words, lambda { |*| true }
+        end
 
-      -> { ExampleModel.new.words_gagged? }.
-        should raise_error(BallGag::NoEngineConfiguredError)
+        it '#{attribute}_gagged? should be false' do
+          ExampleModel.new.words_gagged?.should be_false
+        end
+        it '#{attribute}_gagged? should be true' do
+          ExampleModel.new.words_not_gagged?.should be_true
+        end
+      end
+
+      context 'false' do
+        before do
+          ExampleModel.gag :words, lambda { |*| false }
+        end
+
+        it '#{attribute}_gagged? should be true' do
+          ExampleModel.new.words_gagged?.should be_true
+        end
+        it '#{attribute}_gagged? should be false' do
+          ExampleModel.new.words_not_gagged?.should be_false
+        end
+      end
     end
+  end
 
+  describe 'multiple attributes gagged' do
+    context 'when results map returns true for attribute' do
+      before { ExampleModel.gag :words do |*| { words: true } end }
+
+      it 'should return false for #{attribute}_gagged?' do
+        ExampleModel.new.words_gagged?.should be_false
+      end
+
+      it 'should return true for #{attribute}_not_gagged?' do
+        ExampleModel.new.words_not_gagged?.should be_true
+      end
+    end
+  end
+
+  context 'when gagged with no callable' do
     it 'should call engine when one is configured' do
       BallGag.engine = lambda { |unsanitized_attributes, instance| }
       ExampleModel.gag :words
 
       BallGag.engine.should_receive(:call)
       ExampleModel.new.words_gagged?
+    end
+  end
+
+  context 'when gagged with a callable object' do
+    it 'should check if object is callable' do
+      callable = {}
+      callable.should_receive(:respond_to?).with(:call)
+      ExampleModel.gag :words, callable
     end
   end
 
@@ -135,14 +180,6 @@ describe ExampleModel do
     end
   end
 
-  context 'when gagged with a callable object' do
-    it 'should check if object is callable' do
-      callable = {}
-      callable.should_receive(:respond_to?).with(:call)
-      ExampleModel.gag :words, callable
-    end
-  end
-
   context 'when multiple attributes are gagged' do
     it 'should invoke callable with all attributes and instance' do
       callable = lambda {}
@@ -197,39 +234,28 @@ describe ExampleModel do
     end
   end
 
-  context 'when gagged with a callable' do
-    context 'when callable provides true for attribute' do
-      before { ExampleModel.gag :words do |*| { words: true } end }
+  describe 'error cases' do
+    context 'when gagged with no callable and no engine is configured' do
+      it 'should raise when gag is checekd' do
+        ExampleModel.gag :words
 
-      it 'should return false for attribute_gagged?' do
-        ExampleModel.new.words_gagged?.should be_false
-      end
-
-      it 'should return true for attribute_not_gagged?' do
-        ExampleModel.new.words_not_gagged?.should be_true
+        -> { ExampleModel.new.words_gagged? }.
+          should raise_error(BallGag::NoEngineConfiguredError)
       end
     end
 
-    context 'when callable returns true' do
-      context 'and a single attribute is gagged' do
-        before { ExampleModel.gag :words do |*| true end }
+    context 'when multiple attributes are gagged' do
+      it 'should raise if callable returns non-map result' do
+        mock_result = mock('result')
 
-        it 'should return false for attribute_gagged?' do
-          ExampleModel.new.words_gagged?.should be_false
-        end
+        mock_result.should_receive(:respond_to?).
+          with(:[]).and_return(false)
 
-        it 'should return true for attribute_not_gagged?' do
-          ExampleModel.new.words_not_gagged?.should be_true
-        end
-      end
+        callable = lambda { |*| mock_result }
+        ExampleModel.gag :words, :email, callable
 
-      context 'and multiple attributes are gagged' do
-        before { ExampleModel.gag :words, :email do |*| true end }
-
-        it 'should raise' do
-          -> { ExampleModel.new.words_gagged? }.
-            should raise_error(BallGag::BadResultsMappingError)
-        end
+        -> { ExampleModel.new.words_gagged? }.
+          should raise_error(BallGag::BadResultsMappingError)
       end
     end
   end
