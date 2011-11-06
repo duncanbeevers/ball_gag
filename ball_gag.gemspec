@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ['Duncan Beevers']
   s.email       = ['duncan@dweebd.com']
   s.homepage    = ''
-  s.summary     = 'Pluggable Content Sanitization'
-  s.description = 'Sanitize user input using pluggable back-ends'
+  s.summary     = 'Pluggable User-Content Validation'
+  s.description = 'Validate user input using pluggable back-ends'
 
   s.rubyforge_project = 'ball_gag'
 
