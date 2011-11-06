@@ -44,6 +44,7 @@ module BallGag
     end
 
     def define_not_gagged_interpellations attributes, callable, options = nil
+      one_attribute = 1 == attributes.length
       unsanitized_values = lambda { |it|
         attributes.inject({}) do |a, attribute|
           a[attribute] = it.send(attribute)
@@ -51,7 +52,7 @@ module BallGag
         end
       }
 
-      output = 1 == attributes.length ?
+      output = one_attribute ?
         lambda { |it, attr| unsanitized_values.call(it)[attr] } :
         lambda { |it, attr| unsanitized_values.call(it) }
 
@@ -78,7 +79,7 @@ module BallGag
 
             call_result = @gagged_attribute_results[attributes]
 
-            if 1 == attributes.length
+            if one_attribute
               # If only one attribute was supplied, a simple
               # boolean response is sufficient
               return false unless call_result
