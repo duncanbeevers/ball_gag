@@ -74,6 +74,44 @@ describe ExampleModel do
     end
   end
 
+  context 'when gagged with a block' do
+    it 'should call block when checking whether attribute is gagged' do
+      a = nil
+      b = nil
+      ExampleModel.gag :words do |unsanitized_values, instance|
+        a = unsanitized_values
+        b = instance
+      end
+      instance = ExampleModel.new
+      attribute_value = instance.words
+
+      instance.words_gagged?
+
+      a.should have_key(:words)
+      a[:words].should eq attribute_value
+
+      b.should eq instance
+    end
+  end
+
+  context 'when gagged with a lambda' do
+    it 'should call lambda' do
+      callable = lambda {}
+      ExampleModel.gag :words, callable
+
+      callable.should_receive(:call)
+      ExampleModel.new.words_gagged?
+    end
+  end
+
+  context 'when gagged with a callable object' do
+    it 'should check if object is callable' do
+      callable = {}
+      callable.should_receive(:respond_to?).with(:call)
+      ExampleModel.gag :words, callable
+    end
+  end
+
   context 'when multiple attributes are gagged' do
     it 'should invoke callable with all attributes and instance' do
       callable = lambda {}
@@ -105,22 +143,21 @@ describe ExampleModel do
     end
 
     it 'should cache separate gaggings' do
-      mock_engine = mock('engine')
+      callable = lambda {}
       mock_words = mock('words')
       mock_email = mock('email')
-      BallGag.engine = mock_engine
 
-      ExampleModel.gag :words
-      ExampleModel.gag :email
+      ExampleModel.gag :words, callable
+      ExampleModel.gag :email, callable
 
       instance = ExampleModel.new
       instance.stub!(words: mock_words, email: mock_email)
 
-      mock_engine.should_receive(:call).
+      callable.should_receive(:call).
         with(hash_including(words: mock_words), instance).
         once
 
-      mock_engine.should_receive(:call).
+      callable.should_receive(:call).
         with(hash_including(email: mock_email), instance).
         once
 
@@ -155,24 +192,6 @@ describe ExampleModel do
         with(hash_including(words: mock_words), instance)
 
       instance.words_gagged?
-    end
-
-    it 'should call block when checking whether attribute is gagged' do
-      a = nil
-      b = nil
-      ExampleModel.gag :words do |unsanitized_values, instance|
-        a = unsanitized_values
-        b = instance
-      end
-      instance = ExampleModel.new
-      attribute_value = instance.words
-
-      instance.words_gagged?
-
-      a.should have_key(:words)
-      a[:words].should eq attribute_value
-
-      b.should eq instance
     end
 
     it 'should forward options to callable' do
