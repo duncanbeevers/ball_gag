@@ -24,7 +24,7 @@ end
 Post.new('That was some damn good watermelon').body_gagged?
 # true
 
-Post.new('That was some fine watermelon.').body_gagged?
+Post.new('That was some fine watermelon').body_gagged?
 # false
 ````
 
@@ -44,6 +44,14 @@ class Post < ActiveRecord::Base
 
   validates :body, :not_gagged => true
 end
+````
+
+````ruby
+Post.new(text: 'That was some damn good watermelon').valid?
+# false
+
+Post.new(text: 'That was some fine watermelon').valid?
+# true
 ````
 
 ## Engines / Global configuration
@@ -104,8 +112,7 @@ class ModerationServiceEngine
 
     gag_options, instance = options.values_at(:options, :instance)
 
-    sender = gag_options[:sender].
-      bind(instance).call
+    sender = gag_options[:sender].bind(instance).call
 
     response = new(*MyApp::ApplicationConfig.moderation_service_credentials).
       get('/moderate', query: { fields: fields, user: sender })
