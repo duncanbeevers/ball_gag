@@ -43,7 +43,7 @@ module BallGag
       undefine_gagged_attributes_methods
     end
 
-    def define_not_gagged_interpellations attributes, callable, options = nil
+    def define_not_gagged_interpellations attributes, callable, gag_options = nil
       one_attribute = 1 == attributes.length
       unsanitized_values = lambda { |it|
         attributes.inject({}) do |a, attribute|
@@ -60,26 +60,21 @@ module BallGag
         callable.arity :
         callable.method(:call).arity.abs
 
-      fn = case arity
-      when 1
-        lambda { |it, attr|
-          callable.call(output.call(it, attr)) }
-      when 2
-        lambda { |it, attr|
-          callable.call(output.call(it, attr), options || it) }
-      when 3
-        lambda { |it, attr|
-          callable.call(output.call(it, attr), it, options || attr) }
-      when 4
-        lambda { |it, attr|
-          callable.call(output.call(it, attr), it, options || {}, attr) }
+      fn = nil
+      if 1 == arity
+        fn = lambda { |it, attr| callable.call(output.call(it, attr)) }
       else
-        options ?
-          lambda { |it, attr|
-            callable.call(output.call(it, attr), it, options, attr) } :
-          lambda { |it, attr|
-            callable.call(output.call(it, attr), it, attr) }
+        options = {}
+        fn = lambda do |it, attr|
+          callable.call(output.call(it, attr),
+            { options: gag_options,
+              instance: it,
+              attr: attr
+            }
+          )
+          end
       end
+
 
       attributes.each do |attr|
         @gagged_attributes_methods.send(:define_method,
