@@ -40,7 +40,7 @@ Now a <tt>NotGaggedValidator</tt> is available which you can use like this.
 ````ruby
 class Post < ActiveRecord::Base
   include BallGag
-  gag :body { |body| !/damn/.match body }
+  gag(:body) { |body| !/damn/.match body }
 
   validates :body, :not_gagged => true
 end
@@ -102,7 +102,7 @@ class ModerationServiceEngine
       return call(options[:attr] => fields, options)
     end
 
-    gag_options = options[:options]
+    gag_options, instance = options.values_at(:options, :instance)
 
     sender = gag_options[:sender].
       bind(instance).call
