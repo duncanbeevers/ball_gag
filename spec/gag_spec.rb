@@ -138,10 +138,17 @@ describe ExampleModel do
     specify 'callable is called with attr in options' do
       callable = lambda { |map, options| }
       ExampleModel.gag :words, :email, callable
+
       callable.should_receive(:call).
         with(anything, hash_including(attr: :words)).
         and_return({})
+      ExampleModel.new.words_gagged?
 
+      callable.should_receive(:call).
+        with(anything, hash_including(attr: :email)).
+        and_return({})
+      ExampleModel.new.email_gagged?
+    end
 
       ExampleModel.new.words_gagged?
     end
