@@ -64,18 +64,15 @@ module BallGag
       if 1 == arity
         fn = lambda { |it, attr| callable.call(output.call(it, attr)) }
       else
-        options = {}
         fn = lambda do |it, attr|
           callable.call(output.call(it, attr),
             { options: gag_options,
               instance: it,
               attr: attr,
               single: one_attribute
-            }
-          )
+            })
           end
       end
-
 
       attributes.each do |attr|
         @gagged_attributes_methods.send(:define_method,
