@@ -102,6 +102,14 @@ describe ExampleModel do
 
       instance.words_gagged?
     end
+
+    specify 'callable is called with single: true in options' do
+      callable = lambda { |words, options| }
+      ExampleModel.gag :words, callable
+      callable.should_receive(:call).
+        with(anything, hash_including(single: true))
+      ExampleModel.new.words_gagged?
+    end
   end
 
   describe 'multiple attributes gagged' do
@@ -150,6 +158,12 @@ describe ExampleModel do
       ExampleModel.new.email_gagged?
     end
 
+    specify 'callable is called with single: false in options' do
+      callable = lambda { |map, options| }
+      ExampleModel.gag :words, :email, callable
+      callable.should_receive(:call).
+        with(anything, hash_including(single: false)).
+        and_return({})
       ExampleModel.new.words_gagged?
     end
   end

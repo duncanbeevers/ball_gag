@@ -69,7 +69,8 @@ module BallGag
           callable.call(output.call(it, attr),
             { options: gag_options,
               instance: it,
-              attr: attr
+              attr: attr,
+              single: one_attribute
             }
           )
           end
