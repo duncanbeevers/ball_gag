@@ -47,10 +47,10 @@ end
 ````
 
 ````ruby
-Post.new(text: 'That was some damn good watermelon').valid?
+Post.new(body: 'That was some damn good watermelon').valid?
 # false
 
-Post.new(text: 'That was some fine watermelon').valid?
+Post.new(body: 'That was some fine watermelon').valid?
 # true
 ````
 
