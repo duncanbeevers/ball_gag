@@ -124,6 +124,36 @@ end
 BallGag.engine = ModerationServiceEngine
 ````
 
+## Cloaking
+If you need flexibility in how the library is used, you can reprogram the API.
+First, an alternative top-level module called <tt>BowlingBall</tt> is provided. Include <tt>BowlingBall</tt> in your models to get access to the same functionality you would get with <tt>BallGag</tt>.
+You can also specify an alternate verb for gagging attributes, and an alternate preterite form of the verb for querying the attribute. The preterite form supplied also makes positive and negative validations of the same name available.
+
+````ruby
+BowlingBall.verb = 'censor'
+BowlingBall.preterite = 'censored'
+
+class Post < ActiveRecord::Base
+  validates :text, not_censored: true
+  censor(:text) { |text| !/damn/.match text }
+end
+````
+
+You may also indicate that the preterite form of the verb has an inverted meaning.
+
+````ruby
+BowlingBall.verb = 'censor'
+BowlingBall.negative_preterite = 'acceptable'
+
+class Post < ActiveRecord::Base
+  validates :text, acceptable: true
+  censor(:text) { |text| !/damn/.match text }
+end
+
+Post.new(text: 'That was some damn fine watermelon').text_acceptable?
+# false
+````
+
 ## License
 
 MIT License
