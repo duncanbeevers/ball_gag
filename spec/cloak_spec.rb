@@ -105,8 +105,17 @@ describe 'BallGag cloaking' do
       instance.errors[:words].should include 'is censored'
     end
 
+    specify 'negative preterite should create inverse validator' do
       BallGag.negative_preterite = 'acceptable'
+      ExampleActiveModel.gag(:words) { |words| false }
+      ExampleActiveModel.validates :words, acceptable: true
+      instance = ExampleActiveModel.new
+      instance.valid?
+      instance.errors[:words].should include 'is not acceptable'
+    end
+
     specify 'negative preterite should alter message but not meaning of extant validators' do
+      BallGag.negative_preterite = 'acceptable'
 
       ExampleActiveModel.gag(:words) { |words| false }
       ExampleActiveModel.validates :words, not_gagged: true

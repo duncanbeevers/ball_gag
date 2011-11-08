@@ -24,13 +24,13 @@ module BallGag
     end
 
     def preterite= preterite
-      set_preterite preterite
       @preterite_negative = false
+      set_preterite preterite
     end
 
     def negative_preterite= preterite
-      set_preterite preterite
       @preterite_negative = true
+      set_preterite preterite
     end
 
     def preterite_negative?
@@ -50,8 +50,10 @@ module BallGag
     def define_preterite_validators preterite
       return unless preterite
 
-      Kernel.const_set(validator_name(preterite), Class.new(GaggedValidator))
-      Kernel.const_set(not_validator_name(preterite), Class.new(NotGaggedValidator))
+      new_validators = [ Class.new(GaggedValidator), Class.new(NotGaggedValidator) ]
+      new_validators.reverse! if BallGag.preterite_negative?
+      Kernel.const_set(validator_name(preterite), new_validators[0])
+      Kernel.const_set(not_validator_name(preterite), new_validators[1])
     end
 
     def undefine_old_preterite_validators preterite
