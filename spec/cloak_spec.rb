@@ -2,8 +2,15 @@ require 'spec_helper'
 
 describe 'BallGag cloaking' do
   before do
-    BallGag.verb = nil
     ExampleModel.clear_gagged_attributes
+    BallGag.verb = nil
+    BallGag.preterite = nil
+  end
+
+  after do
+    ExampleModel.clear_gagged_attributes
+    BallGag.verb = nil
+    BallGag.preterite = nil
   end
 
   it 'should have default verb' do
@@ -30,6 +37,27 @@ describe 'BallGag cloaking' do
     BallGag.verb = 'censor'
     BallGag.verb = nil
     ExampleModel.should_not respond_to :censor
+  end
+
+  it 'should have preterite' do
+    BallGag.preterite.should eq 'gagged'
+  end
+
+  it 'should accept new preterite' do
+    BallGag.preterite = 'censored'
+    BallGag.preterite.should eq 'censored'
+  end
+
+  it 'should define #{attribute}_#{preterite}? method on instance' do
+    BallGag.preterite = 'censored'
+    ExampleModel.gag :words
+    ExampleModel.new.should respond_to :words_censored?
+  end
+
+  it 'should define #{attribute}_not_#{preterite}? method on instance' do
+    BallGag.preterite = 'censored'
+    ExampleModel.gag :words
+    ExampleModel.new.should respond_to :words_not_censored?
   end
 end
 

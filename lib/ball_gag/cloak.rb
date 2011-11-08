@@ -18,6 +18,14 @@ module BallGag
         end
       end
     end
+
+    def preterite
+      @preterite || 'gagged'
+    end
+
+    def preterite= preterite
+      @preterite = preterite
+    end
   end
 
   extend Cloak

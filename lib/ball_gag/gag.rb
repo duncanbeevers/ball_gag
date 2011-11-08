@@ -109,16 +109,15 @@ module BallGag
     end
 
     def gagged_attribute_interpellation_name attribute
-      "#{attribute}_gagged?"
+      "#{attribute}_#{BallGag.preterite}?"
     end
 
     def gagged_attribute_negative_interpellation_name attribute
-      "#{attribute}_not_gagged?"
+      "#{attribute}_not_#{BallGag.preterite}?"
     end
 
     def undefine_gagged_attributes_methods
       @gagged_attributes.keys.each do |attribute|
-
         @gagged_attributes_methods.send(:remove_method,
           gagged_attribute_interpellation_name(attribute))
 
