@@ -59,5 +59,28 @@ describe 'BallGag cloaking' do
     ExampleModel.gag :words
     ExampleModel.new.should respond_to :words_not_censored?
   end
+
+  it 'should have non-negative preterite' do
+    BallGag.preterite_negative?.should be_false
+  end
+
+  it 'should accept negative preterite' do
+    BallGag.negative_preterite = 'acceptable'
+    BallGag.preterite_negative?.should be_true
+  end
+
+  context 'when preterite is negative' do
+    it 'should invert meaning of #{attribute}_#{preterite}?' do
+      BallGag.negative_preterite = 'acceptable'
+      ExampleModel.gag(:words) { |words| true }
+      ExampleModel.new.words_acceptable?.should be_true
+    end
+
+    it 'should invert meaning of #{attribute}_not_#{preterite}?' do
+      BallGag.negative_preterite = 'acceptable'
+      ExampleModel.gag(:words) { |words| true }
+      ExampleModel.new.words_not_acceptable?.should be_false
+    end
+  end
 end
 

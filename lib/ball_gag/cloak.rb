@@ -25,6 +25,16 @@ module BallGag
 
     def preterite= preterite
       @preterite = preterite
+      @preterite_negative = false
+    end
+
+    def negative_preterite= preterite
+      @preterite = preterite
+      @preterite_negative = true
+    end
+
+    def preterite_negative?
+      @preterite_negative
     end
   end
 

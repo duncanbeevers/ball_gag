@@ -109,11 +109,19 @@ module BallGag
     end
 
     def gagged_attribute_interpellation_name attribute
-      "#{attribute}_#{BallGag.preterite}?"
+      gagged_attribute_preterite_interpellation_name(
+        attribute, !BallGag.preterite_negative?)
     end
 
     def gagged_attribute_negative_interpellation_name attribute
-      "#{attribute}_not_#{BallGag.preterite}?"
+      gagged_attribute_preterite_interpellation_name(
+        attribute, BallGag.preterite_negative?)
+    end
+
+    def gagged_attribute_preterite_interpellation_name attribute, negative
+      negative ?
+        "#{attribute}_#{BallGag.preterite}?" :
+        "#{attribute}_not_#{BallGag.preterite}?"
     end
 
     def undefine_gagged_attributes_methods

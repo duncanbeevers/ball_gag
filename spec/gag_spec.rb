@@ -3,6 +3,8 @@ require 'spec_helper'
 describe ExampleModel do
   before do
     BallGag.engine = nil
+    BallGag.verb = nil
+    BallGag.preterite = nil
     ExampleModel.clear_gagged_attributes
   end
 
