@@ -31,6 +31,22 @@ describe 'ActiveModel::Validations integration' do
       instance.valid?
       instance.errors[:words].should include 'is not acceptable'
     end
+
+    it 'should respect :allow_blank option' do
+      mock_words = mock('words')
+
+      ExampleActiveModel.gag(:words) { |words| false }
+      ExampleActiveModel.validates :words,
+        not_gagged: { allow_blank: true }
+
+      instance = ExampleActiveModel.new
+      instance.stub!(words: mock_words)
+      mock_words.should_receive(:blank?).
+        and_return(true)
+
+      instance.should_not_receive(:words_not_gagged?)
+      instance.valid?
+    end
   end
 
   describe GaggedValidator do
