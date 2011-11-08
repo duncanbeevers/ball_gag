@@ -105,5 +105,29 @@ describe 'BallGag cloaking' do
       instance.errors[:words].should include 'is censored'
     end
   end
+
+  describe BowlingBall do
+    it 'should set verb' do
+      BowlingBall.verb = 'censor'
+      BallGag.verb.should eq 'censor'
+    end
+
+    it 'should set preterite' do
+      BowlingBall.preterite = 'censored'
+      BallGag.preterite.should eq 'censored'
+    end
+
+    it 'should set negative preterite' do
+      BowlingBall.negative_preterite = 'acceptable'
+      BallGag.preterite.should eq 'acceptable'
+      BallGag.preterite_negative?.should be_true
+    end
+
+    it 'should set engine' do
+      mock_engine = mock('engine')
+      BowlingBall.engine = mock_engine
+      BallGag.engine.should eq mock_engine
+    end
+  end
 end
 
