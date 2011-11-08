@@ -20,4 +20,6 @@ Gem::Specification.new do |s|
 
   # specify any dependencies here; for example:
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'activemodel'
 end
