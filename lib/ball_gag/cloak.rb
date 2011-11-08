@@ -39,8 +39,10 @@ module BallGag
 
     private
     def set_preterite preterite
-      undefine_old_preterite_validators @preterite
-      define_preterite_validators preterite
+      if defined?(ActiveModel::EachValidator)
+        undefine_old_preterite_validators @preterite
+        define_preterite_validators preterite
+      end
       
       @preterite = preterite
     end
