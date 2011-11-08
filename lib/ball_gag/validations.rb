@@ -13,7 +13,9 @@ class GaggedValidator < ActiveModel::EachValidator
   end
 
   def default_message
-    "is not #{BallGag.preterite}"
+    BallGag.preterite_negative? ?
+      "is #{BallGag.preterite}" :
+      "is not #{BallGag.preterite}"
   end
 
   def neg_method_name attribute
@@ -34,7 +36,9 @@ class NotGaggedValidator < GaggedValidator
   end
 
   def default_message
-    "is #{BallGag.preterite}"
+    BallGag.preterite_negative? ?
+      "is not #{BallGag.preterite}" :
+      "is #{BallGag.preterite}"
   end
 end
 
