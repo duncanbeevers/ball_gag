@@ -3,12 +3,15 @@ require 'spec_helper'
 describe 'BallGag cloaking' do
   before do
     ExampleModel.clear_gagged_attributes
+    ExampleActiveModel.reset_callbacks :validate
+    ExampleActiveModel.clear_gagged_attributes
     BallGag.verb = nil
     BallGag.preterite = nil
   end
 
   after do
     ExampleModel.clear_gagged_attributes
+    ExampleActiveModel.clear_gagged_attributes
     BallGag.verb = nil
     BallGag.preterite = nil
   end
@@ -80,6 +83,26 @@ describe 'BallGag cloaking' do
       BallGag.negative_preterite = 'acceptable'
       ExampleModel.gag(:words) { |words| true }
       ExampleModel.new.words_not_acceptable?.should be_false
+    end
+  end
+
+  describe 'validators' do
+    specify 'custom preterite should create validator' do
+      BallGag.preterite = 'censored'
+      ExampleActiveModel.gag(:words) { |words| true }
+      ExampleActiveModel.validates :words, censored: true
+      instance = ExampleActiveModel.new
+      instance.valid?
+      instance.errors[:words].should include 'is not censored'
+    end
+
+    specify 'custom preterite should create Not validator' do
+      BallGag.preterite = 'censored'
+      ExampleActiveModel.gag(:words) { |words| false }
+      ExampleActiveModel.validates :words, not_censored: true
+      instance = ExampleActiveModel.new
+      instance.valid?
+      instance.errors[:words].should include 'is censored'
     end
   end
 end
