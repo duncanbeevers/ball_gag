@@ -12,7 +12,10 @@ end
 
 class ExampleActiveModel
   include ActiveModel::Validations
+  include ActiveModel::Dirty
   include BallGag
+
+  define_attribute_methods [ :words ]
 
   def words
     'Welcome to the place where all the creatures meet.'
