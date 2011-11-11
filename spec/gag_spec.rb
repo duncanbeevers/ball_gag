@@ -238,6 +238,25 @@ describe ExampleModel do
       2.times { instance.words_gagged? }
       2.times { instance.email_gagged? }
     end
+
+    it 'can invalidate cache' do
+      callable = lambda {}
+      mock_words = mock('words')
+      ExampleModel.gag :words, callable
+
+
+      instance = ExampleModel.new
+      instance.stub!(words: mock_words)
+      callable.should_receive(:call).
+        with(mock_words, anything).
+        exactly(2).times
+
+      instance.words_gagged?
+
+      instance.invalidate_gag_cache([:words])
+
+      instance.words_gagged?
+    end
   end
 
   describe 'error cases' do

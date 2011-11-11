@@ -7,6 +7,10 @@ module BallGag
     end
   end
 
+  def invalidate_gag_cache attributes
+    @gagged_attribute_results.delete(attributes)
+  end
+
   module ClassMethods
     def gagged_attributes
       clear_gagged_attributes unless @gagged_attributes
