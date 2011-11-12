@@ -4,6 +4,7 @@ describe 'ActiveModel::Validations integration' do
   before do
     ExampleActiveModel.reset_callbacks :validate
     ExampleActiveModel.clear_gagged_attributes
+    BallGag.only_validate_on_attribute_changed = false
   end
 
   describe NotGaggedValidator do
@@ -46,6 +47,23 @@ describe 'ActiveModel::Validations integration' do
 
       instance.should_not_receive(:words_not_gagged?)
       instance.valid?
+    end
+
+    context 'when configured to only check on attribute changed' do
+      before { BallGag.only_validate_on_attribute_changed = true }
+
+      it 'should not call #{attribute}_not_gagged? if attribute is not changed' do
+        callable = lambda {}
+        ExampleActiveModel.gag :words, callable
+        ExampleActiveModel.validates :words,
+          not_gagged: true
+
+        instance = ExampleActiveModel.new
+        instance.should_not be_words_changed
+
+        callable.should_not_receive(:call)
+        instance.valid?
+      end
     end
   end
 

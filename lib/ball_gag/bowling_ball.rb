@@ -31,6 +31,15 @@ module BowlingBall
     def negative_preterite= preterite
       BallGag.negative_preterite = preterite
     end
+
+    def only_validate_on_attribute_changed
+      BallGag.only_validate_on_attribute_changed
+    end
+
+    def only_validate_on_attribute_changed= bool
+      BallGag.only_validate_on_attribute_changed = bool
+    end
+
   end
 end
 

@@ -7,6 +7,7 @@ describe 'BallGag cloaking' do
     ExampleActiveModel.clear_gagged_attributes
     BallGag.verb = nil
     BallGag.preterite = nil
+    BallGag.only_validate_on_attribute_changed = false
   end
 
   after do
@@ -146,6 +147,11 @@ describe 'BallGag cloaking' do
       mock_engine = mock('engine')
       BowlingBall.engine = mock_engine
       BallGag.engine.should eq mock_engine
+    end
+
+    it 'should set only_validate_on_attribute_changed' do
+      BowlingBall.only_validate_on_attribute_changed = true
+      BallGag.only_validate_on_attribute_changed.should be_true
     end
   end
 end

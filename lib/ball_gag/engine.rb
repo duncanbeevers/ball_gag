@@ -1,13 +1,11 @@
 module BallGag
   module Engine
     module ClassMethods
-      def engine
-        @engine
-      end
+      attr_accessor(
+        :engine,
+        :only_validate_on_attribute_changed
+      )
 
-      def engine= new_engine
-        @engine = new_engine
-      end
     end
   end
 
