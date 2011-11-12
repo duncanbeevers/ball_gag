@@ -63,6 +63,24 @@ BallGag.engine = lambda { |content| !/damn/.match content }
 
 Any object that responds to <tt>call</tt> can be used as an engine.
 
+Another global option that can be set is <tt><BallGag.only_validate_on_attribute_changed/tt>. When this is set to true, <tt>:not_gagged</tt> validations will not be run unless the attribute has changed. This can help you avoid writing boilerplate and can make conditionals provided to your validations more concise. Compare the following two examples to see how specifying this option simplifies validations.
+
+````ruby
+BallGag.only_validate_on_attribute_changed = true
+
+class Post < ActiveRecord::Base
+  validates :text, not_gagged: { unless: -> { author.admin? } }
+end
+````
+
+vs.
+
+````ruby
+class Post < ActiveRecord::Base
+  validates :text, not_gagged: { unless: -> { author.admin? || !text_changed? } }
+end
+````
+
 ## Signature
 
 The first argument to <tt>call</tt> is the value, or hash of values to be checked for acceptability.
