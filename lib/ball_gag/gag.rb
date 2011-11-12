@@ -83,8 +83,15 @@ module BallGag
           gagged_attribute_negative_interpellation_name(attr)) do
             @gagged_attribute_results ||= {}
 
+            # Is the attribute dirty?
+            any_changed = attributes.any? do |attribute|
+              dirty_method_name = "#{attribute}_changed?"
+              respond_to?(dirty_method_name) &&
+                method(dirty_method_name).call
+            end
+
             # Have we performed this call already?
-            unless @gagged_attribute_results.has_key?(attributes)
+            if any_changed || !@gagged_attribute_results.has_key?(attributes)
               @gagged_attribute_results[attributes] = fn.call(self, attr)
             end
 
@@ -93,7 +100,7 @@ module BallGag
             if one_attribute
               # If only one attribute was supplied, a simple
               # boolean response is sufficient
-              return false unless call_result
+              return unless call_result
               return true unless call_result.respond_to?(:[])
             else
               raise BadResultsMappingError unless call_result.respond_to?(:[])

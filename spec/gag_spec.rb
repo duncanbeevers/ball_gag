@@ -257,6 +257,23 @@ describe ExampleModel do
 
       instance.words_gagged?
     end
+
+    it 'should should invalidate cache when attribute changes' do
+      callable = lambda {}
+      ExampleActiveModel.gag :words, callable
+      instance = ExampleActiveModel.new
+
+      callable.should_receive(:call).
+        with(instance.words, anything).once
+      callable.should_receive(:call).
+        with(instance.words + ' you see', anything).once
+
+      instance.words_gagged?
+      instance.words = instance.words + ' you see'
+      instance.should be_words_changed
+
+      instance.words_gagged?
+    end
   end
 
   describe 'error cases' do

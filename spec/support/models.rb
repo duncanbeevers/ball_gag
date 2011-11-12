@@ -18,7 +18,12 @@ class ExampleActiveModel
   define_attribute_methods [ :words ]
 
   def words
-    'Welcome to the place where all the creatures meet.'
+    @words || 'Welcome to the place where all the creatures meet.'
+  end
+
+  def words= words
+    words_will_change!
+    @words = words
   end
 end
 
