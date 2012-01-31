@@ -81,6 +81,8 @@ module BallGag
       attributes.each do |attr|
         @gagged_attributes_methods.send(:define_method,
           gagged_attribute_negative_interpellation_name(attr)) do
+            return true unless BallGag.enabled?
+
             @gagged_attribute_results ||= {}
 
             # Is the attribute dirty?

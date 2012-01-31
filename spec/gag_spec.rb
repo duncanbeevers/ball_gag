@@ -324,6 +324,17 @@ describe ExampleModel do
       BallGag.disable!
       BallGag.should_not be_enabled
     end
+
+    context 'when disabled' do
+      before(:each) do
+        BallGag.disable!
+      end
+
+      it 'should not report attribute as gagged' do
+        ExampleModel.gag :words, ->(*) { false }
+        ExampleModel.new.words_gagged?.should be_false
+      end
+    end
   end
 end
 
