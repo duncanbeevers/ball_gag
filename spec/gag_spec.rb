@@ -5,6 +5,7 @@ describe ExampleModel do
     BallGag.engine = nil
     BallGag.verb = nil
     BallGag.preterite = nil
+    BallGag.enable!
     ExampleModel.clear_gagged_attributes
   end
 
@@ -299,6 +300,16 @@ describe ExampleModel do
         -> { ExampleModel.new.words_gagged? }.
           should raise_error(BallGag::BadResultsMappingError)
       end
+    end
+  end
+
+  describe 'global enable/disable' do
+    it 'should respond to enable!' do
+      BallGag.should respond_to(:enable!)
+    end
+
+    it 'should respond to disable!' do
+      BallGag.should respond_to(:disable!)
     end
   end
 end

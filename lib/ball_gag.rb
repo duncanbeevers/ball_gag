@@ -4,6 +4,7 @@ require 'ball_gag/engine'
 require 'ball_gag/errors'
 require 'ball_gag/cloak'
 require 'ball_gag/bowling_ball'
+require 'ball_gag/disable'
 
 begin
   require 'ball_gag/validations'
