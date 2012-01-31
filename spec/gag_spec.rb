@@ -342,6 +342,29 @@ describe ExampleModel do
         ExampleModel.new.words_gagged?
       end
     end
+
+    context 'when disabled with a block' do
+      it 'should not report attribute as gagged' do
+        ExampleModel.gag :words, ->(*) { false }
+        instance = ExampleModel.new
+        BallGag.disable! do
+          instance.words_gagged?.should be_false
+        end
+        instance.words_gagged?.should be_true
+      end
+    end
+
+    context 'when enabled with a block' do
+      it 'should call callable' do
+        ExampleModel.gag :words, ->(*) { false }
+        instance = ExampleModel.new
+        BallGag.disable!
+        BallGag.enable! do
+          instance.words_gagged?.should be_true
+        end
+        instance.words_gagged?.should be_false
+      end
+    end
   end
 end
 
