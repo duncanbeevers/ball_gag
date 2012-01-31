@@ -8,6 +8,7 @@ describe 'BallGag cloaking' do
     BallGag.verb = nil
     BallGag.preterite = nil
     BallGag.only_validate_on_attribute_changed = false
+    BallGag.enable!
   end
 
   after do
@@ -152,6 +153,34 @@ describe 'BallGag cloaking' do
     it 'should set only_validate_on_attribute_changed' do
       BowlingBall.only_validate_on_attribute_changed = true
       BallGag.only_validate_on_attribute_changed.should be_true
+    end
+
+    it 'should enable' do
+      BowlingBall.enable!
+      BowlingBall.should be_enabled
+    end
+
+    it 'should disable' do
+      BowlingBall.disable!
+      BowlingBall.should_not be_enabled
+    end
+
+    it 'should report enabled?' do
+      BowlingBall.should be_enabled
+    end
+
+    it 'should use block provided to enable!' do
+      BowlingBall.disable!
+      BowlingBall.enable! do
+        BowlingBall.should be_enabled
+      end
+    end
+
+    it 'should use block provided to disable!' do
+      BowlingBall.enable!
+      BowlingBall.disable! do
+        BowlingBall.should_not be_enabled
+      end
     end
   end
 end

@@ -40,6 +40,25 @@ module BowlingBall
       BallGag.only_validate_on_attribute_changed = bool
     end
 
+    def enabled?
+      BallGag.enabled?
+    end
+
+    def enable! &block
+      if block
+        BallGag.enable! &block
+      else
+        BallGag.enable!
+      end
+    end
+
+    def disable! &block
+      if block
+        BallGag.disable! &block
+      else
+        BallGag.disable!
+      end
+    end
   end
 end
 
