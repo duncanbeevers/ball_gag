@@ -278,7 +278,7 @@ describe ExampleModel do
 
   describe 'error cases' do
     context 'when gagged with no callable and no engine is configured' do
-      it 'should raise when gag is checekd' do
+      it 'should raise when gag is checked' do
         ExampleModel.gag :words
 
         -> { ExampleModel.new.words_gagged? }.
