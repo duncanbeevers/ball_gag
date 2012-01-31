@@ -311,6 +311,19 @@ describe ExampleModel do
     it 'should respond to disable!' do
       BallGag.should respond_to(:disable!)
     end
+
+    it 'should respond to enabled?' do
+      BallGag.should respond_to(:enabled?)
+    end
+
+    it 'should initially be enabled' do
+      BallGag.should be_enabled
+    end
+
+    it 'should be disabled after disable!' do
+      BallGag.disable!
+      BallGag.should_not be_enabled
+    end
   end
 end
 
