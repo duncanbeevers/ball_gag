@@ -334,6 +334,13 @@ describe ExampleModel do
         ExampleModel.gag :words, ->(*) { false }
         ExampleModel.new.words_gagged?.should be_false
       end
+
+      it 'should not call callable' do
+        callable = ->(*) { false }
+        ExampleModel.gag :words, callable
+        callable.should_not_receive(:call)
+        ExampleModel.new.words_gagged?
+      end
     end
   end
 end
